@@ -1,0 +1,70 @@
+
+.text{
+    background-color: rgb(255, 255, 235);
+    color:#c00000;
+    font-family: "Fira Sans",sans-serif;
+}
+.text.button{
+    background-color:#c00000;
+    color: rgb(255, 255, 235);
+}
+body{
+    background-image: url("../images/pexels-ivo-rainha-527110-1290141.jpg");
+    background-size: cover;
+}
+form.signuplogin{
+    max-width: 1920px;
+    
+}
+form.flex-col{
+    display:flex;
+    flex-direction: column;
+    gap:1px;
+}
+.upload-form{
+    max-width:1500px;
+    width:100%
+}
+.flex-col{
+    display:flex;
+    flex-direction: column;
+    max-width: 200px;
+}
+.row{
+    display:flex;
+    flex-direction: row;
+}
+.column{
+    display:flex;
+    flex-direction: column;
+    padding-bottom: 50px;
+}
+th{
+    color: rgb(255, 255, 235); 
+    background-color:#cc0000;
+}
+navbar{
+    text-align: right;
+}
+table{
+    margin-left: 15%;
+    margin-right: 15%;
+    border:100px;
+    padding:20%;
+}
+
+.anch{
+    margin-left:16px;
+    
+    font-size:150%;
+}
+td,th{
+    width:120px;
+    padding:2%;
+    margin:100%;
+}
+footer{
+    position:absolute;
+    bottom:0;
+    width:100%;
+}

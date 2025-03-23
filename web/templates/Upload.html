@@ -1,0 +1,40 @@
+{%extends "layout.html"%}
+{%block content%}
+<div class="d-flex justify-content-center">
+    <h1 class="text">Document Upload</h1>
+    <form class = "text d-flex  justify-content-center">
+        <input type="text" id="name">
+        <input type="text">
+        <input type="date">
+        <select name="Material Type" id="Material Type">
+            <option value="Journal Article">Journal Article</option>
+            <option value="Book">Book</option>
+            <option value="Manual">Manual</option>
+            <option value="Thesis">Thesis</option>
+            <option value="Research Paper">Research Paper</option>
+            <option value="Patent">Patent</option>
+            <option value="Court Case">Court Case</option>
+            <option value="Newspaper Article">Newspaper Article</option>
+            
+        </select>
+        <select name="Subject Category" id="Subject Category">
+            <option value="Humanities">Humanities</option>
+            <option value="Theatre">Theatre</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Law">Law</option>
+            <option value="Music">Music</option>
+            <option value="Physics">Physics</option>
+            <option value="Chemistry">Chemistry</option>
+            <option value="Biology">Biology</option>
+            <option value="Psychology">Psychology</option>
+            <option value="Sociology">Sociology</option>
+            <option value="Theology">Theology</option>
+        </select>
+        <input type="radio" name="accessibility" id="Open Access" value="Open Access">
+        <input type="radio" name="accessibility" id="University Only" value="University Only">
+        <input type="radio" name="accessibility" id="Restricted" value="Restricted">
+        <input type="file">
+        <input type="submit">
+    </form>
+    </div>
+{%endblock%}

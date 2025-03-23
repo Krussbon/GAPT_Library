@@ -1,0 +1,30 @@
+{%extends "layout.html"%}
+{%block content%}
+<h1 class="text">Access Approval Panel</h1>
+<div class="d-flex flex-wrap">
+{% for x in range(0,10)%}
+<div class="text p-2">
+<h4>PlaceHolderText</h4>
+<p>email@school.edu.mt</p>
+<button class="rounded-pill">Accept</button>
+<button class="rounded-pill">Deny</button>
+</div>
+<br>
+<br>
+{%endfor%}
+</div>
+<br>
+<h1 class="text">Promotion/Demotion Panel</h1>
+<div class="d-flex flex-wrap">
+    {% for x in range(0,10)%}
+    <div class="text p-2">
+    <h4>PlaceHolderText</h4>
+    <p>email@school.edu.mt</p>
+    <button class="rounded-pill">Promote</button>
+    <button class="rounded-pill">Demote</button>
+    </div>
+    <br>
+    <br>
+    {%endfor%}
+    </div>
+{%endblock%}
