@@ -3,9 +3,31 @@
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
+        <div class="text">
         <h1 class="text text-align">Repository</h1>
         
-        <table class="text table-bordered text-align">
+        <div class="filter-buttons justify-content-center ">
+            
+            <button class="rounded text button">Paper</button>
+            <button class="rounded text button">Manual</button>
+            <button class="rounded text button">Journal</button>
+            <button class="rounded text button">Dissertation</button>
+            <button class="rounded text button">Patent</button>
+            <button class="rounded text button">Book</button>
+            <button class="rounded text button">Court Case</button>
+            
+            <form>
+                <input type="search"/>
+                <button class="text button" type="submit"> Search
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                  </svg>
+                </button>
+            </form>
+            
+        </div>
+        </div> 
+        <table style="margin-top:15px; box-shadow: -10px -5px 5px 12px rgba(0,0,0,0.5);" class="text table-bordered repo-table text-align">
             <tr class="title" style="">
                 <th>File Name</th>
                 <th>Date Created</th>
@@ -14,19 +36,29 @@
                 <th>Uploaders</th>
                 <th>Abstract Preview</th>
                 <th>Availability</th>
+                <th>Favourite</th>
                 <th></th>
             </tr>
+            {% for x in range(0,10) %}
             <tr>
-                <td>FileNo</td>
+                <td>FileNo {{x}}</td>
                 <td>19/01/2011</td>
                 <td>Engineering</td>
                 <td>The Author</td>
                 <td>Keith</td>
                 <td>Lorem Impsun</td>
                 <td>Open Access</td>
-                <td style="margin-right:15px;"><button class="rounded-pill">Download</button></td>
+                <td><button style="background-color:transparent;border-color:transparent;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                  </svg>
+                </button></td>
+                <td style="margin-right:15px;  width:200px; "><button style="width:125px; padding:5px;" class="rounded-pill text button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                  </svg>Download    </button></td>
             </tr>
-            
+            {% endfor %}
         </table>
         
 {% endblock %}

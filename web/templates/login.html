@@ -2,6 +2,7 @@
 
 {% block content %}
 <div class="container signuplogin">
+    
         <h1 class="text text-center">Login &amp; Sign-Up</h1>
         <div class="row">
         
@@ -10,10 +11,10 @@
             
                 <form class="text text-center flex-col" method="post">
                     <label for="loginemail">Email</label>
-                    <input type="email" id="loginemail" name="loginemail" required><br>
+                    <input class="rounded" type="email" id="loginemail" name="loginemail" required><br>
                     <label for="loginpassword">Password</label>
-                    <input type="password" id="loginpassword" name="loginpassword" required><br>
-                    <input type="submit" value="Login" class="rounded-pill text button">
+                    <input class="rounded" type="password" id="loginpassword" name="loginpassword" required><br>
+                    <input type="submit" value="Login" style="border-color:#dd1111;" class="rounded-pill text button">
                 </form>
             </div>
     
@@ -22,14 +23,14 @@
     <h2 class="text text-center" >Sign-Up</h2>
     <form class="text text-center flex-col" method="post">
         <label for="signupname">Name</label>
-        <input type="text" id="signupname" name="signupname" required><br>
+        <input class="rounded" type="text" id="signupname" name="signupname" required><br>
         <label for="signupemail">Email</label>
-        <input type="email" id="signupemail" name="signupemail" required><br>
+        <input class="rounded" type="email" id="signupemail" name="signupemail" required><br>
         <label for="signuppassword">Password</label>
-        <input type="password" id="signuppassword" name="signuppassword" required><br>
+        <input class="rounded" type="password" id="signuppassword" name="signuppassword" required><br>
         <label for="signupconfirmpassword">Confirm Password</label>
-        <input type="password" id="signupconfirmpassword" name="signupconfirmpassword" required><br>
-        <input type="submit" value="Sign Up"  class="rounded-pill text button">
+        <input class="rounded" type="password" id="signupconfirmpassword" name="signupconfirmpassword" required><br>
+        <input type="submit" value="Sign Up" style="border-color:#dd1111;"  class="rounded-pill text button">
     </form>
     </div>
     </div>

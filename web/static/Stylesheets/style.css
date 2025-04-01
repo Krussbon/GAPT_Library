@@ -1,12 +1,25 @@
 
 .text{
+    font-family: "Fira Sans",sans-serif;
+}
+.text:not(.download){
     background-color: rgb(255, 255, 235);
     color:#c00000;
-    font-family: "Fira Sans",sans-serif;
+    
+}
+.bi.bi-download{
+    margin-right:3px;
 }
 .text.button{
     background-color:#c00000;
     color: rgb(255, 255, 235);
+}
+.text.button:hover{
+    font-weight: bolder;
+}
+.text.button:active{
+    background-color:rgb(255, 255, 235);
+    color: #c00000;
 }
 body{
     background-image: url("../images/pexels-ivo-rainha-527110-1290141.jpg");
@@ -63,8 +76,16 @@ td,th{
     padding:2%;
     margin:100%;
 }
+.wrapper{
+    flex:1;
+    min-height: 73.5vh;
+}
 footer{
     position:absolute;
-    bottom:0;
+    
     width:100%;
+}
+.filter-buttons{
+    display:flex;
+    flex-direction: row;
 }
