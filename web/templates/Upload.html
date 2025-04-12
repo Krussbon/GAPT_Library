@@ -1,23 +1,35 @@
 {%extends "layout.html"%}
 {%block content%}
-<div class="d-flex justify-content-center">
-    <h1 class="text">Document Upload</h1>
-    <form class = "text d-flex  justify-content-center">
-        <input type="text" id="name">
-        <input type="text">
-        <input type="date">
-        <select name="Material Type" id="Material Type">
-            <option value="Journal Article">Journal Article</option>
-            <option value="Book">Book</option>
-            <option value="Manual">Manual</option>
-            <option value="Thesis">Thesis</option>
-            <option value="Research Paper">Research Paper</option>
-            <option value="Patent">Patent</option>
-            <option value="Court Case">Court Case</option>
-            <option value="Newspaper Article">Newspaper Article</option>
+<div class="row justify-content-center">
+<div class="col-6 column text text-start d-flex align-items-center justify-content-center">
+    
+    <h2 class="text text-center" >Upload</h2>
+    
+        <form class="text text-center justify-content-center flex-col" method="post" enctype="multipart/form-data">
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name" required>
+            <label for="Description">Description</label>
+            <input type="text" name="description" id="description" required>
+            
+            <label for="Uploader">Uploader Name</label>
+        <input id="Uploader" name ="Uploader" type="text" required>
+        <label name=" upload_date" id="upload_date"> Upload Date</label>
+        <input id="upload_date" name ="upload_date" type="date" required>
+        
+        <label name="Material Type" id="Material Type">Material Type</label>
+        <select name="material_type" id="material_type" onchange="updateFormFields()" required>
+            <option value="1">Lecture Notes</option>
+            <option value="2">Assignment</option>
+            <option value="3">Exam/Solution</option>
+            <option value="4">Research Paper</option>
+            <option value="5">Lab Report</option>
+            <option value="6">Thesis/Dissertation</option>
+            <option value="7">Video</option>
+            <option value="8">Presentation</option>
             
         </select>
-        <select name="Subject Category" id="Subject Category">
+        <label name="Subject Category" id="Subject Category">Subject Category</label>
+        <select name="Subject Category" id="Subject Category" required>
             <option value="Humanities">Humanities</option>
             <option value="Theatre">Theatre</option>
             <option value="Computer Science">Computer Science</option>
@@ -30,11 +42,147 @@
             <option value="Sociology">Sociology</option>
             <option value="Theology">Theology</option>
         </select>
-        <input type="radio" name="accessibility" id="Open Access" value="Open Access">
-        <input type="radio" name="accessibility" id="University Only" value="University Only">
-        <input type="radio" name="accessibility" id="Restricted" value="Restricted">
-        <input type="file">
-        <input type="submit">
+        <div id="dynamic-fields"></div>
+        <div class="access-options">
+            <label for="Open_Access">Open Access</label>
+            <input type="radio" name="accessibility" id="Open_Access" value="Open Access" checked>
+            
+            <label for="University_Only">University Only</label>
+            <input type="radio" name="accessibility" id="University_Only" value="University Only">
+            
+            <label for="Restricted">Restricted</label>
+            <input type="radio" name="accessibility" id="Restricted" value="Restricted">
+        </div>
+        <input name="file" id="file" type="file">
+        <button type="submit">Upload</button>
     </form>
     </div>
+    </div>
+    <script>
+        function updateFormFields(){
+            const materialType = document.getElementById('material_type').value;
+            const dynamicFields = document.getElementById('dynamic-fields');
+            dynamicFields.innerHTML = '';
+            switch(materialType){
+                case '1':
+                dynamicFields.innerHTML = 
+                `
+                
+                <label for="Course Name"> Course Name</label>
+                <input id="Course Name" name="Course Name" type="text" required>
+                <label for="Lecturer Name">Lecturer Name</label>
+                <input id="Lecturer Name" name="Lecturer Name" type="text" required>
+                <label for="Semester"> Semester</label>
+                <input id="Semester" name="Semester" type="number" required>
+                <label for="Year" name="Year">Year</label>
+                <input id="Year" name="Year" type="number" required>
+                <label for="Topic">Topic</label>
+                <input id="Topic" name="Topic" type="date" required>
+                
+                
+                `
+                break;
+                case '2':
+                dynamicFields.innerHTML=`
+                <label for="Course Name">Course Name</label>
+                <input id="Course Name" name="Course Name" type="text" required>
+                <label for="Assignment Number">Assignment Number</label>
+                <input id="Assignment Number" name="Assignment Number" type="number" required>
+                <label for="Due Date">Due Date</label>
+                <input id="Due Date" name="Due Date" type="date" required>
+                <label for="Instructor Name">Instructor Name</label>
+                <input id="Instructor Name" name="Instructor Name" type="text" required>
+                <label for="Year">Year</label>
+                <input id="Year" name="Year" type="number" required>
+                `
+                break;
+                case '3':
+                dynamicFields.innerHTML=
+                `
+                <label for="Course Name">Course Name</label>
+                <input id="Course Name" name="Course Name" type="text" required>
+                <label for="Exam Type">Exam Typet</label>
+                <input id="Exam Type" name="Exam Type" type="text" required>
+                <label for="Year">Year</label>
+                <input id="Year" name="Year" type="text" required>
+                <label for="Instructor">Instructor</label>
+                <input id="Instructor" name="Instructor" type="text" required>
+                <label for="Duration">Duration(hrs)</label>
+                <input id="Duration" name="Duration" type="number" required>
+                `
+                break;
+                case '4':
+                dynamicFields.innerHTML=`
+                <label for="Title">Title</label>
+                <input id="Title" name="Title" type="text" required>
+                <label for="Authors">Authors</label>
+                <input id="Authors" name="Authors" type="text" required>
+                <label for="Publication Year">Publication Year</label>
+                <input id="Publication Year" name="Publication Year" type="number" required>
+                <label for="Journal/Conference Name">Journal/Conference Name</label>
+                <input id="FacultyJournal/Conference Name" name="Journal/Conference Name" type="text" required>
+
+                `
+                break;
+                case '5':
+                dynamicFields.innerHTML=`
+                <label for="Experiment Title">Experiment Title</label>
+                <input id="Experiment Title" name="Experiment Title" type="text" required>
+                <label for="Subject">Subject</label>
+                <input id="Subject" name="Subject" type="text" required>
+                <label for="instructor">instructor</label>
+                <input id="instructor" name="instructor" type="text" required>
+                <label for="Lab Partner(s)">Lab Partner(s)</label>
+                <input id="Lab Partner(s)" name="Lab Partner(s)" type="text" required>
+                `
+                break;
+                case '6':
+                dynamicFields.innerHTML=`
+                <label for="Title">Title</label>
+                <input id="Title" name="Title" type="text" required>
+                <label for="Student Name">Student Name</label>
+                <input id="Student Name" name="Student Name" type="text" required>
+                <label for="Supervisor">Supervisor</label>
+                <input id="Supervisor" name="Supervisor" type="text" required>
+                <label for="Department">Department</label>
+                <input id="Department" name="Department" type="text" required>
+                <label for="Year">Year</label>
+                <input id="Year" name="Year" type="number" required>
+                <label for="Abstract">Abstract</label>
+                <input id="Abstract" name="Abstract" type="text" required>
+                <label for="Degree Level">Degree Level</label>
+                <input id="Degree Level" name="Degree Level" type="text" required
+                `
+                break;
+                case '7':
+                dynamicFields.innerHTML=`
+                <label for="Course Name">Course Name</label>
+                <input id="Course Name" name="Course Name" type="text" required>
+                <label for="Title">Title</label>
+                <input id="Title" name="Title" type="text" required>
+                <label for="Instructor">Instructor</label>
+                <input id="Instructor" name="Instructor" type="text" required>
+                <label for="Duration">Duration</label>
+                <input id="Duration" name="Duration" type="number" required>
+                <label for="topic">topic</label>
+                <input id="topic" name="topic" type="text" required>
+                `
+                break;
+                case '8':
+                dynamicFields.innerHTML=`
+                <label for="Title">Title</label>
+                <input id="Title" name="Title" type="text" required>
+                <label for="Speaker Name">Speaker Name</label>
+                <input id="Speaker Name" name="Speaker Name" type="text" required>
+                <label for="Event/Course Name">Event/Course Name</label>
+                <input id="Event/Course Name" name="Event/Course Name" type="text" required>
+                <label for="Date Presented">Date Presented</label>
+                <input id="Date Presented" name="Date Presented" type="date" required>
+                <label for="topic">topic</label>
+                <input id="topic" name="topic" type="text" required>
+                `
+                break;
+            }
+        }
+    </script>
 {%endblock%}
