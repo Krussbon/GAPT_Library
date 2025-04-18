@@ -2,12 +2,15 @@
 {%block content%}
 <h1 class="text">Access Approval Panel</h1>
 <div class="d-flex flex-wrap">
-{% for x in range(0,10)%}
+{% for x in pending %}
 <div class="text p-2">
-<h4>PlaceHolderText</h4>
-<p>email@school.edu.mt</p>
-<button class="rounded-pill">Accept</button>
-<button class="rounded-pill">Deny</button>
+<h4>{{ x[0] }} {{ x[1] }}</h4>
+<p>{{ x[2] }}</p>
+<form method="post" action="/handle_request" >
+    <input type="hidden"  name="request_id" value="{{ x[6] }}">
+    <button class="rounded-pill" name="action" id="action" value = "accept">Accept</button>
+    <button class="rounded-pill"name="action" id="action"  value = "deny">Deny</button>
+</form>
 </div>
 <br>
 <br>

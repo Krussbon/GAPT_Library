@@ -28,25 +28,23 @@
         </div>
         </div> 
         <table style="margin-top:15px; box-shadow: -10px -5px 5px 12px rgba(0,0,0,0.5);" class="text table-bordered repo-table text-align">
-            <tr class="title" style="">
+            <tr class="title" >
                 <th>File Name</th>
                 <th>Date Created</th>
                 <th>Subject Category</th>
                 <th>Author(s)</th>
                 <th>Uploaders</th>
-                <th>Abstract Preview</th>
                 <th>Availability</th>
                 <th>Favourite</th>
                 <th></th>
             </tr>
-            {% for x in range(0,10) %}
+            {% for x in files %}
             <tr>
-                <td>FileNo {{x}}</td>
-                <td>19/01/2011</td>
-                <td>Engineering</td>
+                <td>{{ x[0] }}</td>
+                <td>{{ x[4] }}</td>
+                <td>{{ x[8] }}</td>
                 <td>The Author</td>
                 <td>Keith</td>
-                <td>Lorem Impsun</td>
                 <td>Open Access</td>
                 <td><button style="background-color:transparent;border-color:transparent;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
@@ -60,6 +58,8 @@
             </tr>
             {% endfor %}
         </table>
-        
+        {% if session['RoleID']>=2 %}
+        <a class="text" href="{{ url_for('upload')}}">Upload</a>
+        {% endif %}
 {% endblock %}
      

@@ -1,6 +1,9 @@
 {%extends "layout.html"%}
 {%block content%}
-        <h1 class="text text-center">Welcome to AcaRep<br><br> Your number one Academic Repository</h1>
+        <h1 class="text text-center">Welcome to AcaRep{% if session['name'] and session['surname'] %}
+          , {{session['name']}} {{session['surname']}}
+        {% endif %}  
+        <br><br> Your number one Academic Repository</h1>
         <h2 class="text text-center"> We have not hundreds, not thousands but millions of Academic papers ready for you to study</h2>
         
         <div class="container">

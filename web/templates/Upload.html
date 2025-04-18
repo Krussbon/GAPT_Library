@@ -11,8 +11,7 @@
             <label for="Description">Description</label>
             <input type="text" name="description" id="description" required>
             
-            <label for="Uploader">Uploader Name</label>
-        <input id="Uploader" name ="Uploader" type="text" required>
+        
         <label name=" upload_date" id="upload_date"> Upload Date</label>
         <input id="upload_date" name ="upload_date" type="date" required>
         
@@ -28,8 +27,8 @@
             <option value="8">Presentation</option>
             
         </select>
-        <label name="Subject Category" id="Subject Category">Subject Category</label>
-        <select name="Subject Category" id="Subject Category" required>
+        <label name="subject_category" id="subject_category">Subject Category</label>
+        <select name="subject_category" id="subject_category" required>
             <option value="Humanities">Humanities</option>
             <option value="Theatre">Theatre</option>
             <option value="Computer Science">Computer Science</option>
@@ -45,13 +44,13 @@
         <div id="dynamic-fields"></div>
         <div class="access-options">
             <label for="Open_Access">Open Access</label>
-            <input type="radio" name="accessibility" id="Open_Access" value="Open Access" checked>
+            <input type="radio" name="accessibility" id="accessibility" value="Open Access" checked>
             
             <label for="University_Only">University Only</label>
-            <input type="radio" name="accessibility" id="University_Only" value="University Only">
+            <input type="radio" name="accessibility" id="accessibility" value="University Only">
             
             <label for="Restricted">Restricted</label>
-            <input type="radio" name="accessibility" id="Restricted" value="Restricted">
+            <input type="radio" name="accessibility" id="accessibility" value="Restricted">
         </div>
         <input name="file" id="file" type="file">
         <button type="submit">Upload</button>

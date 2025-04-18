@@ -21,7 +21,7 @@
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <navbar ><div class="text"><div class="justify-content-start d-flex"><a href="{{ url_for('index') }}" class="text"><img style="width:40px;" src="../static/images/book-7672463_1280.png">AcaRep</a></div><div class="justify-content-end d-flex"><a class="anch text" href="{{ url_for('login') }}">Login</a><a class="anch text" href="{{ url_for('repo') }}">Repository</a></div></div></navbar>
+        <navbar ><div class="text"><div class="justify-content-start d-flex"><a href="{{ url_for('index') }}" class="text"><img style="width:40px;" src="../static/images/book-7672463_1280.png">AcaRep</a></div><div class="justify-content-end d-flex">{% if not session['user_id']%}<a class="anch text" href="{{ url_for('login') }}">Login</a>{% endif %}<a class="anch text" href="{{ url_for('repo') }}">Repository</a></div></div></navbar>
         <div class="wrapper">
         {% block content %}
         {% endblock %}
