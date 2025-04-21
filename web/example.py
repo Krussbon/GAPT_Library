@@ -185,14 +185,95 @@ def upload():
             insert_value=(name,description,path,uploader_id,upload_date,accessibility,cat_id,subject_category)
             cursor.execute(new_record,insert_value)
             conn.commit()
+
             
             
             file.save(path)
+            find_records=(f"""Select * from "UMRepo"."Attributes" where cat_id=%s """)
+            new_record = (f"""Insert into "UMRepo"."file_attributes"(file_id,attr_id,value)
+                          values(%s,%s,%s);""")
+            attrs=[]
+            cursor.execute(find_records,(cat_id,))
+            recs = cursor.fetchall()
+            cursor.execute("""select max(file_id) from "UMRepo"."file""")
+            maximum = cursor.fetchone()
+            start = 1
+            if cat_id == 1:
+                course_name = request.form.get("Course Name",'').strip()
+                lecturer_name = request.form.get('Lecturer Name', '').strip()
+                semester = request.form.get('Semester', '').strip()
+                year = request.form.get('Year', '').strip()
+                topic = request.form.get('Topic', '').strip()
+                attrs = [course_name,lecturer_name,semester,year,topic]
+            elif cat_id == 2:
+                start = 6
+                course_name = request.form.get("Course Name",'').strip()
+                assignment_number = request.form.get('Assignment Number', '').strip()
+                due_date = request.form.get('Due Date', '').strip()
+                instructor_name = request.form.get('Instructor Name', '').strip()
+                year = request.form.get('Year', '').strip()
+                attrs = [course_name,assignment_number,due_date,instructor_name,year]
+            elif cat_id == 3:
+                start = 23
+                course_name = request.form.get("Course Name",'').strip()
+                exam_type = request.form.get('Exam Type', '').strip()
+                year = request.form.get('Year', '').strip()
+                due_date = request.form.get('Due Date', '').strip()
+                instructor = request.form.get('Instructor', '').strip()
+                duration = request.form.get("Duration",'').strip()
+                attrs = [course_name,exam_type,year,due_date,instructor,duration]
+            elif cat_id == 4:
+                start = 39
+                title = request.form.get("Title",'').strip()
+                authors = request.form.get('Authors', '').strip()
+                publication_year = request.form.get('Publication Year', '').strip()
+                p_name = request.form.get('Journal/Conference Name', '').strip()
+                attrs = [title,authors,publication_year,p_name]
+            elif cat_id == 5:
+                start = 11
+                exeriment_title = request.form.get("Experiment Title",'').strip()
+                subject = request.form.get('Subject', '').strip()
+                instructor = request.form.get('instructor', '').strip()
+                lab_partners = request.form.get('Lab Partners', '').strip()
+                attrs = [exeriment_title,subject,instructor,lab_partners]
+            elif cat_id == 6:
+                start = 16
+                title = request.form.get("Title",'').strip()
+                student_name = request.form.get('Student Name', '').strip()
+                supervisor = request.form.get('Supervisor', '').strip()
+                department = request.form.get('Department', '').strip()
+                year = request.form.get('Year', '').strip()
+                abstract = request.form.get("Abstract",'').strip()
+                degree_level = request.form.get('Degree Level', '').strip()
+                attrs = [student_name,supervisor,department,year,year,abstract,degree_level]
+            elif cat_id == 7:
+                start = 33
+                course_name = request.form.get("Course Name",'').strip()
+                instructor = request.form.get('Instructor', '').strip()
+                duration = request.form.get('Duration', '').strip()
+                topic = request.form.get('Topic', '').strip()
+                title = request.form.get('Title', '').strip()
+                attrs = [course_name,instructor,duration,topic,title]
+            elif cat_id == 8:
+                start=28
+                title = request.form.get("Title",'').strip()
+                speaker_name = request.form.get('Speaker Name', '').strip()
+                course_name = request.form.get('Course Name', '').strip()
+                date_presented = request.form.get('Date Presented', '').strip()
+                topic = request.form.get('Topic', '').strip()
+                attrs = [title,speaker_name,course_name,date_presented,topic]
+            for attr in attrs:
+                cursor.execute(new_record,(maximum,start,attr,))
+                start += 1
+
+            print(recs)
+            
             return redirect("/thx4upl")
     else:
         return abort(403)
 @app.errorhandler(403)
 def forbidden_error(error):
+
     return render_template('403.html',reason="Only teachers and librarians are allowed"),403
 @app.route("/thx")
 def thank_you():
