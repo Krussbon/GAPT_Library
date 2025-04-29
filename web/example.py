@@ -263,8 +263,10 @@ def upload():
                 topic = request.form.get('Topic', '').strip()
                 attrs = [title,speaker_name,course_name,date_presented,topic]
             for attr in attrs:
+                maximum += 1
                 cursor.execute(new_record,(maximum,start,attr,))
                 start += 1
+                
 
             print(recs)
             
