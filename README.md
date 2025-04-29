@@ -1,22 +1,31 @@
-📚 Academic Repository Website
+# 📚 Academic Repository Website ACE
+
 A platform for students and teachers to share, access, and interact with academic materials easily and securely.
 
- Project Overview
+ # Project Overview
+ 
 The Academic Repository platform allows:
 
- Students to browse, view, and download study materials.
+- Students to browse, view, and download study materials.
 
- Teachers to upload educational content and manage access to it.
+- Teachers to upload educational content and manage access to it.
 
- Librarians to approve new users and manage repository content.
+- Librarians to approve new users and manage repository content.
 
-This project fosters academic collaboration by making learning resources organized and accessible.
+- This project fosters academic collaboration by making learning resources organized and accessible.
 
-🛠 Tech Stack
+# 🛠 Tech Stack
 
-Frontend	Backend	Database	Tools
-React.js	Python	PostgreSQL (pgAdmin)	Visual Studio Code
- Key Features
+Frontend: HTML, CSS, JavaScript (React.js)
+
+Backend: Python
+
+Database: PostgreSQL (managed with pgAdmin)
+
+IDE: Visual Studio Code
+
+# 🎯 Key Features
+
  Secure authentication and role-based access control.
 
  Material upload and download system.
@@ -27,15 +36,9 @@ React.js	Python	PostgreSQL (pgAdmin)	Visual Studio Code
 
  Responsive and user-friendly interface.
 
-📋 How to Run the Project Locally
-Clone the Repository:
+# 📋 How to Run the Project Locally
 
-bash
-Copy
-Edit
-git clone https://github.com/yourusername/academic-repository.git
-cd academic-repository
-Backend Setup:
+- Backend Setup:
 
 Install Python dependencies:
 
@@ -45,7 +48,7 @@ Edit
 pip install -r requirements.txt
 Configure your database connection in the backend.
 
-Run the Backend:
+- Run the Backend:
 
 bash
 Copy
@@ -55,13 +58,14 @@ Frontend Setup:
 
 Navigate to the frontend folder.
 
-Install React dependencies:
+- Install React dependencies:
 
 bash
 Copy
 Edit
 npm install
-Start the frontend server:
+
+- Start the frontend server:
 
 bash
 Copy
@@ -69,6 +73,6 @@ Edit
 npm start
 Access the App:
 
-Open your browser and visit: 
+- Open your browser and visit: 
 
-🎉 Thank you for checking out the Academic Repository Project!
+# 🎉 Thank you for checking out the Academic Repository Project!
