@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="container py-5" data-aos="zoom-in">
+    <div class="card p-4 shadow-lg" style="border-radius: 20px; background: rgba(255,255,255,0.95);">
+      <h2 class="text-danger fw-bold mb-4">Help & Support</h2>
+  
+      <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+              <i class="fas fa-sign-in-alt me-2"></i> Login Issues
+            </button>
+          </h2>
+          <div id="faq1" class="accordion-collapse collapse">
+            <div class="accordion-body">Make sure your credentials are correct. Request access if you're new.</div>
+          </div>
+        </div>
+        
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+              <i class="fas fa-upload me-2"></i> Uploading Files
+            </button>
+          </h2>
+          <div id="faq2" class="accordion-collapse collapse">
+            <div class="accordion-body">Only teachers and librarians can upload. Accepted: PDF, DOCX, ZIP.</div>
+          </div>
+        </div>
+  
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+              <i class="fas fa-user-lock me-2"></i> Access Requests
+            </button>
+          </h2>
+          <div id="faq3" class="accordion-collapse collapse">
+            <div class="accordion-body">Students must request access for certain materials.</div>
+          </div>
+        </div>
+      </div>
+      
+      <p class="mt-4">Still need help? Email us at <a href="mailto:umrepository22@edu.mt">umrepository22@edu.mt</a></p>
+    </div>
+  </section>
+  
+{% endblock %}

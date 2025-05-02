@@ -94,6 +94,8 @@ def login():
         ls = cursor.fetchone()
         print(ls)
         if len(login_email) > 0:
+            if ls is None:
+                return redirect("/denied")
             
             if bcrypt.checkpw(login_pswd, ls[3].encode("utf-8")):
                 session["user_id"]=ls[5]
@@ -133,6 +135,7 @@ def login():
                 with open(requests_path, "w") as file:
                     json.dump(requests, file)
                 print("Signup request added:", requests)
+            return redirect("/thx")
 
     return render_template("login.html")
 @app.route("/repo")
@@ -195,7 +198,7 @@ def upload():
             attrs=[]
             cursor.execute(find_records,(cat_id,))
             recs = cursor.fetchall()
-            cursor.execute("""select max(file_id) from "UMRepo"."file""")
+            cursor.execute("""select max(file_id) from "UMRepo"."file"  """)
             maximum = cursor.fetchone()
             start = 1
             if cat_id == 1:
@@ -316,9 +319,29 @@ def handle_request():
     conn.commit()
     cursor.execute(get_records)
     return redirect("/access_request")
-if __name__ == '__main__':
-
-    app.run(host="0.0.0.0")
 @app.route('/403')
 def forbidden():
     return render_template('403.html'), 403
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+@app.route('/help_page')
+def help_page():
+    return render_template('help.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/index')
+
+if __name__ == '__main__':
+
+    app.run(host="0.0.0.0")
+
+

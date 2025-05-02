@@ -17,6 +17,7 @@
   <!-- AOS CSS -->
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
+
   <style>
     body {
       font-family: 'Fira Sans', sans-serif;
@@ -50,12 +51,16 @@
       <a class="navbar-brand d-flex align-items-center text-danger fw-bold fs-4" href="{{ url_for('index') }}">
         <img src="{{ url_for('static', filename='images/book-7672463_1280.png') }}" width="32" class="me-2"> AcaRep
       </a>
-      <div class="ms-auto">
-        {% if not session.get('user_id') %}
-          <a class="text-danger fw-semibold me-4" href="{{ url_for('login') }}">Login</a>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        {% if session.get('user_id') %}
+          <a class="text-danger fw-semibold" href="{{ url_for('repo') }}">Repository</a>
+          <a class="text-danger fw-semibold" href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+          <a class="text-danger fw-semibold" href="{{ url_for('login') }}">Login</a>
         {% endif %}
-        <a class="text-danger fw-semibold" href="{{ url_for('repo') }}">Repository</a>
       </div>
+      
+      
     </div>
   </nav>
 
@@ -66,6 +71,10 @@
 
   <!-- Footer -->
   <footer class="mt-auto py-3">
+
+    
+    
+
     <div class="container">
       <div class="row text-center text-md-start">
         <div class="col-md-4 mb-2">
@@ -75,9 +84,9 @@
         </div>
         <div class="col-md-4 mb-2">
           <h6>Quick Links</h6>
-          <a href="#">About Us</a><br>
-          <a href="#">Help</a><br>
-          <a href="#">Privacy Policy</a>
+          <a href="{{ url_for('about') }}">About Us</a><br>
+          <a href="{{ url_for('help_page') }}">Help</a><br>
+          <a href="{{ url_for('privacy') }}">Privacy Policy</a>
         </div>
         <div class="col-md-4 mb-2">
           <h6>University</h6>

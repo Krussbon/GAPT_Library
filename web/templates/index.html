@@ -16,10 +16,17 @@
     <p class="fw-semibold text-danger mt-3" data-aos="fade-down" data-aos-delay="400">
       We have not hundreds, not thousands, but <strong>millions</strong> of academic papers ready for you to study 📚
     </p>
+
     <div class="mt-4" data-aos="zoom-in" data-aos-delay="600">
-      <a href="{{ url_for('repo') }}" class="btn btn-danger btn-lg me-2">Browse Repository</a>
+      {% if session.get('name') and session.get('surname') %}
+        <a href="{{ url_for('repo') }}" class="btn btn-danger btn-lg me-2">Browse Repository</a>
+      {% endif %}
       <a href="{{ url_for('login') }}" class="btn btn-outline-danger btn-lg">Log In / Sign Up</a>
     </div>
+
+    {% if not session.get('name') %}
+      <p class="text-muted mt-3">Join now to explore exclusive academic content, upload your own work, and become part of a thriving scholarly community.</p>
+    {% endif %}
   </div>
 </section>
 
@@ -58,3 +65,4 @@
 </section>
 
 {% endblock %}
+

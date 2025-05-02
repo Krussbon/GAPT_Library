@@ -1,187 +1,181 @@
-{%extends "layout.html"%}
-{%block content%}
-<div class="row justify-content-center">
-<div class="col-6 column text text-start d-flex align-items-center justify-content-center">
-    
-    <h2 class="text text-center" >Upload</h2>
-    
-        <form class="text text-center justify-content-center flex-col" method="post" enctype="multipart/form-data">
-            <label for="name">Name</label>
-            <input type="text" name="name" id="name" required>
-            <label for="Description">Description</label>
-            <input type="text" name="description" id="description" required>
-            
-        
-        <label name=" upload_date" id="upload_date"> Upload Date</label>
-        <input id="upload_date" name ="upload_date" type="date" required>
-        
-        <label name="Material Type" id="Material Type">Material Type</label>
-        <select name="material_type" id="material_type" onchange="updateFormFields()" required>
-            <option value="1">Lecture Notes</option>
-            <option value="2">Assignment</option>
-            <option value="3">Exam/Solution</option>
-            <option value="4">Research Paper</option>
-            <option value="5">Lab Report</option>
-            <option value="6">Thesis/Dissertation</option>
-            <option value="7">Video</option>
-            <option value="8">Presentation</option>
-            
-        </select>
-        <label name="subject_category" id="subject_category">Subject Category</label>
-        <select name="subject_category" id="subject_category" required>
-            <option value="Humanities">Humanities</option>
-            <option value="Theatre">Theatre</option>
-            <option value="Computer Science">Computer Science</option>
-            <option value="Law">Law</option>
-            <option value="Music">Music</option>
-            <option value="Physics">Physics</option>
-            <option value="Chemistry">Chemistry</option>
-            <option value="Biology">Biology</option>
-            <option value="Psychology">Psychology</option>
-            <option value="Sociology">Sociology</option>
-            <option value="Theology">Theology</option>
-        </select>
-        <div id="dynamic-fields"></div>
-        <div class="access-options">
-            <label for="Open_Access">Open Access</label>
-            <input type="radio" name="accessibility" id="accessibility" value="Open Access" checked>
-            
-            <label for="University_Only">University Only</label>
-            <input type="radio" name="accessibility" id="accessibility" value="University Only">
-            
-            <label for="Restricted">Restricted</label>
-            <input type="radio" name="accessibility" id="accessibility" value="Restricted">
-        </div>
-        <input name="file" id="file" type="file">
-        <button type="submit">Upload</button>
-    </form>
-    </div>
-    </div>
-    <script>
-        function updateFormFields(){
-            const materialType = document.getElementById('material_type').value;
-            const dynamicFields = document.getElementById('dynamic-fields');
-            dynamicFields.innerHTML = '';
-            switch(materialType){
-                case '1':
-                dynamicFields.innerHTML = 
-                `
-                
-                <label for="Course Name"> Course Name</label>
-                <input id="Course Name" name="Course Name" type="text" required>
-                <label for="Lecturer Name">Lecturer Name</label>
-                <input id="Lecturer Name" name="Lecturer Name" type="text" required>
-                <label for="Semester"> Semester</label>
-                <input id="Semester" name="Semester" type="number" required>
-                <label for="Year" name="Year">Year</label>
-                <input id="Year" name="Year" type="number" required>
-                <label for="Topic">Topic</label>
-                <input id="Topic" name="Topic" type="text" required>
-                
-                
-                `
-                break;
-                case '2':
-                dynamicFields.innerHTML=`
-                <label for="Course Name">Course Name</label>
-                <input id="Course Name" name="Course Name" type="text" required>
-                <label for="Assignment Number">Assignment Number</label>
-                <input id="Assignment Number" name="Assignment Number" type="number" required>
-                <label for="Due Date">Due Date</label>
-                <input id="Due Date" name="Due Date" type="date" required>
-                <label for="Instructor Name">Instructor Name</label>
-                <input id="Instructor Name" name="Instructor Name" type="text" required>
-                <label for="Year">Year</label>
-                <input id="Year" name="Year" type="number" required>
-                `
-                break;
-                case '3':
-                dynamicFields.innerHTML=
-                `
-                <label for="Course Name">Course Name</label>
-                <input id="Course Name" name="Course Name" type="text" required>
-                <label for="Exam Type">Exam Typet</label>
-                <input id="Exam Type" name="Exam Type" type="text" required>
-                <label for="Year">Year</label>
-                <input id="Year" name="Year" type="text" required>
-                <label for="Instructor">Instructor</label>
-                <input id="Instructor" name="Instructor" type="text" required>
-                <label for="Duration">Duration(hrs)</label>
-                <input id="Duration" name="Duration" type="number" required>
-                `
-                break;
-                case '4':
-                dynamicFields.innerHTML=`
-                <label for="Title">Title</label>
-                <input id="Title" name="Title" type="text" required>
-                <label for="Authors">Authors</label>
-                <input id="Authors" name="Authors" type="text" required>
-                <label for="Publication Year">Publication Year</label>
-                <input id="Publication Year" name="Publication Year" type="number" required>
-                <label for="Journal/Conference Name">Journal/Conference Name</label>
-                <input id="Journal/Conference Name" name="Journal/Conference Name" type="text" required>
+{% extends "layout.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg rounded-4">
+        <div class="card-body p-5 bg-light">
 
-                `
-                break;
-                case '5':
-                dynamicFields.innerHTML=`
-                <label for="Experiment Title">Experiment Title</label>
-                <input id="Experiment Title" name="Experiment Title" type="text" required>
-                <label for="Subject">Subject</label>
-                <input id="Subject" name="Subject" type="text" required>
-                <label for="instructor">instructor</label>
-                <input id="instructor" name="instructor" type="text" required>
-                <label for="Lab Partners">Lab Partner(s)</label>
-                <input id="Lab Partners" name="Lab Partners" type="text" required>
-                `
-                break;
-                case '6':
-                dynamicFields.innerHTML=`
-                <label for="Title">Title</label>
-                <input id="Title" name="Title" type="text" required>
-                <label for="Student Name">Student Name</label>
-                <input id="Student Name" name="Student Name" type="text" required>
-                <label for="Supervisor">Supervisor</label>
-                <input id="Supervisor" name="Supervisor" type="text" required>
-                <label for="Department">Department</label>
-                <input id="Department" name="Department" type="text" required>
-                <label for="Year">Year</label>
-                <input id="Year" name="Year" type="number" required>
-                <label for="Abstract">Abstract</label>
-                <input id="Abstract" name="Abstract" type="text" required>
-                <label for="Degree Level">Degree Level</label>
-                <input id="Degree Level" name="Degree Level" type="text" required
-                `
-                break;
-                case '7':
-                dynamicFields.innerHTML=`
-                <label for="Course Name">Course Name</label>
-                <input id="Course Name" name="Course Name" type="text" required>
-                <label for="Title">Title</label>
-                <input id="Title" name="Title" type="text" required>
-                <label for="Instructor">Instructor</label>
-                <input id="Instructor" name="Instructor" type="text" required>
-                <label for="Duration">Duration</label>
-                <input id="Duration" name="Duration" type="number" required>
-                <label for="Topic">Topic</label>
-                <input id="Topic" name="Topic" type="text" required>
-                `
-                break;
-                case '8':
-                dynamicFields.innerHTML=`
-                <label for="Title">Title</label>
-                <input id="Title" name="Title" type="text" required>
-                <label for="Speaker Name">Speaker Name</label>
-                <input id="Speaker Name" name="Speaker Name" type="text" required>
-                <label for="Course Name">Event/Course Name</label>
-                <input id="Course Name" name="Course Name" type="text" required>
-                <label for="Date Presented">Date Presented</label>
-                <input id="Date Presented" name="Date Presented" type="date" required>
-                <label for="Topic">Topic</label>
-                <input id="Topic" name="Topic" type="text" required>
-                `
-                break;
-            }
-        }
+          <h2 class="text-center text-danger fw-bold mb-4"> Upload</h2>
+
+          <form method="POST" enctype="multipart/form-data" id="uploadForm">
+            <div class="mb-3">
+              <label for="name" class="form-label text-danger">Name</label>
+              <input type="text" name="name" id="name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label text-danger">Description</label>
+              <input type="text" name="description" id="description" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="upload_date" class="form-label text-danger">Upload Date</label>
+              <input type="date" name="upload_date" id="upload_date" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="material_type" class="form-label text-danger">Material Type</label>
+              <select name="material_type" id="material_type" class="form-select" onchange="updateFormFields()" required>
+                <option value="1">Lecture Notes</option>
+                <option value="2">Assignment</option>
+                <option value="3">Exam/Solution</option>
+                <option value="4">Research Paper</option>
+                <option value="5">Lab Report</option>
+                <option value="6">Thesis/Dissertation</option>
+                <option value="7">Video</option>
+                <option value="8">Presentation</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="subject_category" class="form-label text-danger">Subject Category</label>
+              <select name="subject_category" id="subject_category" class="form-select" required>
+                <option value="Humanities">Humanities</option>
+                <option value="Theatre">Theatre</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Law">Law</option>
+                <option value="Music">Music</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Biology">Biology</option>
+                <option value="Psychology">Psychology</option>
+                <option value="Sociology">Sociology</option>
+                <option value="Theology">Theology</option>
+              </select>
+            </div>
+
+            <div id="dynamic-fields" class="mb-4"></div>
+
+            <div class="mb-4">
+              <label class="form-label text-danger">Accessibility</label><br>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="accessibility" id="open_access" value="Open Access" checked>
+                <label class="form-check-label" for="open_access">Open Access</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="accessibility" id="university_only" value="University Only">
+                <label class="form-check-label" for="university_only">University Only</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="accessibility" id="restricted" value="Restricted">
+                <label class="form-check-label" for="restricted">Restricted</label>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="file" class="form-label text-danger">Select File</label>
+              <input class="form-control" type="file" name="file" id="file" required>
+            </div>
+
+            <button type="submit" class="btn btn-danger w-100 rounded-pill fw-semibold">🚀 Upload</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--  JavaScript function -->
+ 
+<script>
+    function updateFormFields() {
+      const materialType = document.getElementById('material_type').value;
+      const dynamicFields = document.getElementById('dynamic-fields');
+      dynamicFields.innerHTML = '';
+    
+      const fieldTemplate = (label, name, type = 'text') => `
+        <div class="mb-3">
+          <label for="${name}" class="form-label text-danger">${label}</label>
+          <input id="${name}" name="${name}" type="${type}" class="form-control" required>
+        </div>
+      `;
+    
+      switch(materialType) {
+        case '1': // Lecture Notes
+          dynamicFields.innerHTML = 
+            fieldTemplate("Course Name", "Course Name") +
+            fieldTemplate("Lecturer Name", "Lecturer Name") +
+            fieldTemplate("Semester", "Semester", "number") +
+            fieldTemplate("Year", "Year", "number") +
+            fieldTemplate("Topic", "Topic");
+          break;
+    
+        case '2': // Assignment
+          dynamicFields.innerHTML = 
+            fieldTemplate("Course Name", "Course Name") +
+            fieldTemplate("Assignment Number", "Assignment Number", "number") +
+            fieldTemplate("Due Date", "Due Date", "date") +
+            fieldTemplate("Instructor Name", "Instructor Name") +
+            fieldTemplate("Year", "Year", "number");
+          break;
+    
+        case '3': // Exam/Solution
+          dynamicFields.innerHTML = 
+            fieldTemplate("Course Name", "Course Name") +
+            fieldTemplate("Exam Type", "Exam Type") +
+            fieldTemplate("Year", "Year") +
+            fieldTemplate("Instructor", "Instructor") +
+            fieldTemplate("Duration (hrs)", "Duration", "number");
+          break;
+    
+        case '4': // Research Paper
+          dynamicFields.innerHTML = 
+            fieldTemplate("Title", "Title") +
+            fieldTemplate("Authors", "Authors") +
+            fieldTemplate("Publication Year", "Publication Year", "number") +
+            fieldTemplate("Journal/Conference Name", "Journal/Conference Name");
+          break;
+    
+        case '5': // Lab Report
+          dynamicFields.innerHTML = 
+            fieldTemplate("Experiment Title", "Experiment Title") +
+            fieldTemplate("Subject", "Subject") +
+            fieldTemplate("Instructor", "Instructor") +
+            fieldTemplate("Lab Partners", "Lab Partners");
+          break;
+    
+        case '6': // Thesis/Dissertation
+          dynamicFields.innerHTML = 
+            fieldTemplate("Title", "Title") +
+            fieldTemplate("Student Name", "Student Name") +
+            fieldTemplate("Supervisor", "Supervisor") +
+            fieldTemplate("Department", "Department") +
+            fieldTemplate("Year", "Year", "number") +
+            fieldTemplate("Abstract", "Abstract") +
+            fieldTemplate("Degree Level", "Degree Level");
+          break;
+    
+        case '7': // Video
+          dynamicFields.innerHTML = 
+            fieldTemplate("Course Name", "Course Name") +
+            fieldTemplate("Title", "Title") +
+            fieldTemplate("Instructor", "Instructor") +
+            fieldTemplate("Duration", "Duration", "number") +
+            fieldTemplate("Topic", "Topic");
+          break;
+    
+        case '8': // Presentation
+          dynamicFields.innerHTML = 
+            fieldTemplate("Title", "Title") +
+            fieldTemplate("Speaker Name", "Speaker Name") +
+            fieldTemplate("Event/Course Name", "Course Name") +
+            fieldTemplate("Date Presented", "Date Presented", "date") +
+            fieldTemplate("Topic", "Topic");
+          break;
+      }
+    }
     </script>
-{%endblock%}
+    
+{% endblock %}

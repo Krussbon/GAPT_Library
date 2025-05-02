@@ -1,8 +1,24 @@
-{%extends "layout.html"%}
-{%block content%}
-<div>
-    <h1 class="text"> Thank you for Uploading</h1>
-    <img src="../static/images/Thanks Love GIF by FOMO Duck.gif">
+{% extends "layout.html" %}
+{% block content %}
+<section class="py-5 text-center" style="background: url({{ url_for('static', filename='images/library-bg.jpg') }}) center / cover no-repeat;">
 
-</div>
-{%endblock%}
+  <div class="container bg-white bg-opacity-75 rounded-4 shadow p-5">
+    
+    <h1 class="text-danger fw-bold display-4 mb-3"> Thank You for Uploading!</h1>
+    
+    <p class="text-muted fs-5 mb-4">
+      Your file has been successfully submitted to the academic repository. Sharing knowledge empowers the entire academic community.
+    </p>
+
+    <hr class="my-4" style="border-top: 2px solid #c00000; width: 60%; margin: auto;">
+
+    <p class="text-dark mt-4">You can now continue exploring the repository.</p>
+
+    <a href="{{ url_for('repo') }}" class="btn btn-danger btn-lg rounded-pill px-4 mt-3 fw-semibold shadow">
+       Browse Repository
+    </a>
+
+  </div>
+</section>
+{% endblock %}
+
