@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect,abort,session
+from flask import Flask, render_template, request, redirect,abort,session,send_from_directory
 from flask_login import UserMixin
 
 import os
@@ -65,6 +65,13 @@ class Pending(db.Model,UserMixin):
     surname = db.Column(db.String(50))
     pass_hash= db.Column(db.Text)
     RoleId = db.Column(db.Integer)
+class Favourite(db.Model):
+    __tablename__ = "favourites"
+    __table_args__ = {'schema': 'UMRepo'}
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey('UMRepo.User.user_id'))
+    file_id = db.Column(db.Integer, ForeignKey('UMRepo.file.file_id'))
+
 REPO_FOLDER = os.getenv('REPO_FOLDER')
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'txt', 'pptx', 'zip'}
 MAX_FILE_SIZE = 10 * 1024 * 1024 
@@ -138,13 +145,60 @@ def login():
             return redirect("/thx")
 
     return render_template("login.html")
-@app.route("/repo")
+@app.route("/repo",methods=["POST","GET"])
 def repo():
-    find_record = (f"""select * from "UMRepo"."file" """)
+    
     cursor = conn.cursor()
-    cursor.execute(find_record)
-    files = cursor.fetchall()
-    return render_template("repository.html",files=files)
+    cursor.execute('select * from "UMRepo"."Category"')
+    categories = cursor.fetchall()
+    print(categories)
+    files=None
+    check = """SELECT "file_id" FROM "UMRepo"."favourites" WHERE user_id = %s"""
+    cursor.execute(check, (session["user_id"],))
+    favs = [row[0] for row in cursor.fetchall()]
+    fav_add = ""
+    if request.method == "POST":
+        if request.form.get("favourites","") != 'on':
+        
+            if request.form.get("material_type") is None and request.form.get("search_images") is None:
+                find_record = (f"""select * from "UMRepo"."file" """)
+                cursor.execute(find_record)
+                files = cursor.fetchall()
+            elif request.form.get("material_type") is None:
+                filter_records=(f"""select * from "UMRepo"."file" WHERE levenshtein(name, %s) < 5;""")
+                cursor.execute(filter_records, (request.form.get("search_images"),))
+            elif request.form.get("search_images") is None:
+                filter_records=(f"""select * from "UMRepo"."file" WHERE cat_id = %s;""")
+                cursor.execute(filter_records, (request.form.get("material_type"),))
+            else:
+                filter_records=(f"""select * from "UMRepo"."file" WHERE levenshtein(name, %s) < 5 and cat_id = %s;""")
+                cursor.execute(filter_records, (request.form.get("search_images"),(request.form.get("material_type"),)))
+            files=cursor.fetchall()
+    
+
+        
+        
+        else:
+            if request.form.get("material_type") is None and request.form.get("search_images") is None:
+                find_record = (f"""select * from "UMRepo"."file" file join "UMRepo"."favourites" fav on fav.file_id = file.file_id""")
+                cursor.execute(find_record,)
+            elif request.form.get("material_type") is None:
+                filter_records=(f"""select * from "UMRepo"."file" file join "UMRepo"."favourites" fav on fav.file_id = file.file_id  WHERE levenshtein(name, %s) < 5;""")
+                cursor.execute(filter_records, (request.form.get("search_images"),))
+            elif request.form.get("search_images") is None:
+                filter_records=(f"""select * from "UMRepo"."file" file join "UMRepo"."favourites" fav on fav.file_id = file.file_id  WHERE cat_id = %s;""")
+                cursor.execute(filter_records, (request.form.get("material_type"),))
+            else:
+                filter_records=(f"""select * from "UMRepo"."file" file join "UMRepo"."favourites" fav on fav.file_id = file.file_id  WHERE levenshtein(name, %s) < 5 and cat_id = %s;""")
+                cursor.execute(filter_records, (request.form.get("search_images"),(request.form.get("material_type"),)))
+            files=cursor.fetchall()
+    else:
+        find_record = (f"""select * from "UMRepo"."file" """)
+        cursor.execute(find_record)
+        files = cursor.fetchall()
+
+    
+    return render_template("repository.html",files=files,categories=categories,favs=favs)
 @app.route("/granted")
 def granted():
     return render_template("granted.html")
@@ -163,6 +217,7 @@ def upload():
             cat_id = request.form.get('material_type', '').strip()
             
             accessibility = request.form.get('accessibility', '').strip()
+            print(accessibility)
             file = request.files['file']
             subject_category = request.form.get('subject_category','').strip()
             if 'file' not in request.files or request.files['file'].filename == '':
@@ -177,7 +232,7 @@ def upload():
                     upload_date =request.form['upload_date']
             except ValueError:
                 return "Invalid date format (YYYY-MM-DD required)", 400
-            path = os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(file.filename))
+            path = os.path.join(app.config['UPLOAD_FOLDER'],secure_filename())
             
             new_record = (f"""Insert into "UMRepo"."file"(name,description,path,uploader,upload_date,visibility,cat_id,subject_category)
                 
@@ -185,7 +240,8 @@ def upload():
             
             
             cursor=conn.cursor()
-            insert_value=(name,description,path,uploader_id,upload_date,accessibility,cat_id,subject_category)
+            
+            insert_value=(name,description,secure_filename(file.filename),uploader_id,upload_date,accessibility,cat_id,subject_category)
             cursor.execute(new_record,insert_value)
             conn.commit()
 
@@ -339,6 +395,34 @@ def help_page():
 def logout():
     session.clear()
     return redirect('/index')
+
+@app.route('/download/<filepath>')
+def download(filepath):
+    filename = filepath.split("\\")[-1]
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+@app.route('/toggle_favourite/<int:file_id>',methods=["GET"])
+def toggle_favourite(file_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return abort(403)
+
+    cursor = conn.cursor()
+    check = """SELECT * FROM "UMRepo"."favourites" WHERE user_id = %s AND file_id = %s"""
+    cursor.execute(check, (user_id, file_id))
+    fav = cursor.fetchone()
+
+    if fav:
+        # Already favourited → remove it
+        delete = """DELETE FROM "UMRepo"."favourites" WHERE user_id = %s AND file_id = %s"""
+        cursor.execute(delete, (user_id, file_id))
+    else:
+        # Not favourited → add it
+        insert = """INSERT INTO "UMRepo"."favourites"(user_id, file_id) VALUES (%s, %s)"""
+        cursor.execute(insert, (user_id, file_id))
+
+    conn.commit()
+    print(session)
+    return redirect("/repo")
 
 if __name__ == '__main__':
 

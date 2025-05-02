@@ -10,18 +10,21 @@
         , {{ session.get('name') }} {{ session.get('surname') }}
       {% endif %}
     </h1>
+
     <p class="lead text-dark mt-3" data-aos="fade-down" data-aos-delay="200">
       Your number one Academic Repository
     </p>
+
     <p class="fw-semibold text-danger mt-3" data-aos="fade-down" data-aos-delay="400">
-      We have not hundreds, not thousands, but <strong>millions</strong> of academic papers ready for you to study 📚
+      We have not hundreds, not thousands, but <strong>millions</strong> of academic papers ready for you to study 
     </p>
 
     <div class="mt-4" data-aos="zoom-in" data-aos-delay="600">
       {% if session.get('name') and session.get('surname') %}
-        <a href="{{ url_for('repo') }}" class="btn btn-danger btn-lg me-2">Browse Repository</a>
+        <a href="{{ url_for('repo') }}" class="btn btn-danger btn-lg rounded-pill px-4 fw-semibold">📂 Browse Repository</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-outline-danger btn-lg rounded-pill px-4 fw-semibold">🔑 Log In / Sign Up</a>
       {% endif %}
-      <a href="{{ url_for('login') }}" class="btn btn-outline-danger btn-lg">Log In / Sign Up</a>
     </div>
 
     {% if not session.get('name') %}
