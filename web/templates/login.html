@@ -1,40 +1,57 @@
-{%extends "layout.html"%}
-
+{% extends "layout.html" %}
 {% block content %}
-<div class="container signuplogin">
-    
-        <h1 class="text text-center">Login &amp; Sign-Up</h1>
-        <div class="row">
-        
-            <div class="col-6 column text text-start d-flex align-items-center justify-content-end">
-            <h2 class="text text-center" >Login</h2>
-            
-                <form class="text text-center flex-col" method="post">
-                    <label for="loginemail">Email</label>
-                    <input class="rounded" type="email" id="loginemail" name="loginemail" required><br>
-                    <label for="loginpassword">Password</label>
-                    <input class="rounded" type="password" id="loginpassword" name="loginpassword" required><br>
-                    <input type="submit" value="Login" style="border-color:#dd1111;" class="rounded-pill text button">
-                </form>
+
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="text-center text-danger fw-bold mb-4" data-aos="fade-down">Login & Sign-Up</h2>
+    <div class="row justify-content-center g-4">
+
+      <!-- Login Card -->
+      <div class="col-md-5" data-aos="fade-right">
+        <div class="card shadow-sm p-4 border-0">
+          <h4 class="text-danger mb-3">Login</h4>
+          <form method="POST">
+            <div class="mb-3">
+              <label for="loginemail" class="form-label text-muted">Email</label>
+              <input type="email" class="form-control" name="loginemail" required>
             </div>
-    
-    
-    <div class ="col column col-6 text text-start d-flex align-items-center justify-content-end">
-    <h2 class="text text-center" >Sign-Up</h2>
-    <form class="text text-center flex-col" method="post">
-        <label for="signupname">Name</label>
-        <input class="rounded" type="text" id="signupname" name="signupname" required><br>
-        <label for="signupsurname">Surname</label>
-        <input class="rounded" type="text" id="signupsurname" name="signupsurname" required><br>
-        <label for="signupemail">Email</label>
-        <input class="rounded" type="email" id="signupemail" name="signupemail" required><br>
-        <label for="signuppassword">Password</label>
-        <input class="rounded" type="password" id="signuppassword" name="signuppassword" required><br>
-        <label for="signupconfirmpassword">Confirm Password</label>
-        <input class="rounded" type="password" id="signupconfirmpassword" name="signupconfirmpassword" required><br>
-        <input type="submit" value="Sign Up" style="border-color:#dd1111;"  class="rounded-pill text button">
-    </form>
+            <div class="mb-3">
+              <label for="loginpassword" class="form-label text-muted">Password</label>
+              <input type="password" class="form-control" name="loginpassword" required>
+            </div>
+            <button type="submit" class="btn btn-danger w-100">Login</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Sign-Up Card -->
+      <div class="col-md-5" data-aos="fade-left">
+        <div class="card shadow-sm p-4 border-0">
+          <h4 class="text-danger mb-3">Sign Up</h4>
+          <form method="POST">
+            <div class="mb-3">
+              <label for="signupname" class="form-label text-muted">Name</label>
+              <input type="text" class="form-control" name="signupname" required>
+            </div>
+            <div class="mb-3">
+              <label for="signupsurname" class="form-label text-muted">Surname</label>
+              <input type="text" class="form-control" name="signupsurname" required>
+            </div>
+            <div class="mb-3">
+              <label for="signupemail" class="form-label text-muted">Email</label>
+              <input type="email" class="form-control" name="signupemail" required>
+            </div>
+            <div class="mb-3">
+              <label for="signuppassword" class="form-label text-muted">Password</label>
+              <input type="password" class="form-control" name="signuppassword" required>
+            </div>
+            <button type="submit" class="btn btn-outline-danger w-100">Sign Up</button>
+          </form>
+        </div>
+      </div>
+
     </div>
-    </div>
-    </div>
+  </div>
+</section>
+
 {% endblock %}

@@ -89,3 +89,38 @@ footer{
     display:flex;
     flex-direction: row;
 }
+
+.brand {
+    color: #b30000;
+    font-weight: bold;
+  }
+  
+  .features .shadow-sm:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+  }
+  
+  .about {
+    background: #b30000 !important;
+  }
+  
+  .card {
+    border-radius: 1rem;
+  }
+  
+  input.form-control {
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+  }
+  
+  .btn-danger,
+  .btn-outline-danger {
+    font-weight: bold;
+    border-radius: 0.5rem;
+  }
+  
+  .btn-outline-danger:hover {
+    background-color: #b30000;
+    color: white;
+  }
+  
