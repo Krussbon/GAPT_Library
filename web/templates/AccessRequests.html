@@ -1,33 +1,54 @@
-{%extends "layout.html"%}
-{%block content%}
-<h1 class="text">Access Approval Panel</h1>
-<div class="d-flex flex-wrap">
-{% for x in pending %}
-<div class="text p-2">
-<h4>{{ x[0] }} {{ x[1] }}</h4>
-<p>{{ x[2] }}</p>
-<form method="post" action="/handle_request" >
-    <input type="hidden"  name="request_id" value="{{ x[6] }}">
-    <button class="rounded-pill" name="action" id="action" value = "accept">Accept</button>
-    <button class="rounded-pill"name="action" id="action"  value = "deny">Deny</button>
-</form>
-</div>
-<br>
-<br>
-{%endfor%}
-</div>
-<br>
-<h1 class="text">Promotion/Demotion Panel</h1>
-<div class="d-flex flex-wrap">
-    {% for x in range(0,10)%}
-    <div class="text p-2">
-    <h4>PlaceHolderText</h4>
-    <p>email@school.edu.mt</p>
-    <button class="rounded-pill">Promote</button>
-    <button class="rounded-pill">Demote</button>
+{% extends "layout.html" %}
+{% block content %}
+
+<h1 class="text-danger fw-bold mt-4">Access Approval Panel</h1>
+<div class="row">
+  {% for x in pending %}
+  <div class="col-md-4 mb-3">
+    <div class="card shadow-sm p-3">
+      <h5 class="fw-semibold">{{ x[0] }} {{ x[1] }}</h5>
+      <p class="text-muted mb-1">{{ x[2] }}</p>
+      <form method="post" action="/handle_request">
+        <input type="hidden" name="request_id" value="{{ x[6] }}">
+        <button class="btn btn-success btn-sm rounded-pill" name="action" value="accept">Accept</button>
+        <button class="btn btn-outline-danger btn-sm rounded-pill" name="action" value="deny">Deny</button>
+      </form>
     </div>
-    <br>
-    <br>
-    {%endfor%}
+  </div>
+  {% endfor %}
+</div>
+
+<hr class="my-4">
+
+<h1 class="text-danger fw-bold">Promotion/Demotion Panel</h1>
+<div class="row">
+  {% for user in users %}
+  {% if user[5] != session['user_id'] %}
+  <div class="col-md-4 mb-3">
+    <div class="card bg-light border-danger shadow-sm p-3 h-100">
+      <h5 class="fw-semibold">{{ user[1] }} {{ user[2] }}</h5>
+      <p class="text-muted mb-1">{{ user[3] }}</p>
+      <p><strong>Role:</strong>
+        {% if user[6] == 1 %} Student
+        {% elif user[6] == 2 %} Teacher
+        {% elif user[6] == 3 %} Librarian
+        {% endif %}
+      </p>
+      <form method="POST" action="/promote_demote">
+        <input type="hidden" name="target_user_id" value="{{ user[5] }}">
+        {% if user[6] == 1 %}
+        <button class="btn btn-danger btn-sm rounded-pill" name="action" value="promote">Promote to Teacher</button>
+        {% elif user[6] == 2 %}
+        <button class="btn btn-danger btn-sm rounded-pill mb-1" name="action" value="promote">Promote to Librarian</button>
+        <button class="btn btn-outline-dark btn-sm rounded-pill" name="action" value="demote">Demote to Student</button>
+        {% elif user[6] == 3 %}
+        <button class="btn btn-outline-dark btn-sm rounded-pill" name="action" value="demote">Demote to Teacher</button>
+        {% endif %}
+      </form>
     </div>
-{%endblock%}
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+
+{% endblock %}

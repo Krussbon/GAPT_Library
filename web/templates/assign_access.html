@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="mt-4 text-danger">Assign Access to Restricted File</h2>
+<form method="POST">
+  <input type="hidden" name="file_id" value="{{ file_id }}">
+  {% for s in students %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" name="allowed_users" value="{{ s[0] }}" id="student{{ s[0] }}">
+      <label class="form-check-label" for="student{{ s[0] }}">
+        {{ s[1] }} {{ s[2] }}
+      </label>
+    </div>
+  {% endfor %}
+  <button class="btn btn-danger mt-3" type="submit">Save Access</button>
+</form>
+{% endblock %}

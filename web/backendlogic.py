@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect,abort,session,send_from_directory
+from flask import Flask, render_template, request, redirect,abort,session,send_from_directory,url_for
 from flask_login import UserMixin
 
 import os
@@ -132,10 +132,12 @@ def login():
         
                 cursor=conn.cursor()
                 role_id = 0
-                if signup_email.split("@")[0].isalnum():
+                if any(char.isdigit() for char in signup_email.split('@')[0]):
                     role_id=1
                 else:
                     role_id=2
+                if signup_email.split('@')[1] != "um.edu.mt":
+                    return redirect("/denied")
                 insert_value=(signup_name,signup_surname,signup_email,signup_hashpswd,role_id)
                 cursor.execute(new_record,insert_value)
                 conn.commit()
@@ -145,66 +147,116 @@ def login():
             return redirect("/thx")
 
     return render_template("login.html")
-@app.route("/repo",methods=["POST","GET"])
+@app.route("/repo", methods=["POST", "GET"])
 def repo():
-    
     cursor = conn.cursor()
-    cursor.execute('select * from "UMRepo"."Category"')
+
+    # Fetch categories
+    cursor.execute('SELECT * FROM "UMRepo"."Category"')
     categories = cursor.fetchall()
-    print(categories)
-    files=None
-    check = """SELECT "file_id" FROM "UMRepo"."favourites" WHERE user_id = %s"""
-    cursor.execute(check, (session["user_id"],))
-    favs = [row[0] for row in cursor.fetchall()]
-    fav_add = ""
+
+    favs = []
+    user_id = session.get("user_id")
+    files = []
+
+    # Fetch user's favourite file_ids
+    if user_id:
+        cursor.execute('SELECT "file_id" FROM "UMRepo"."favourites" WHERE user_id = %s', (user_id,))
+        favs = [row[0] for row in cursor.fetchall()]
+
+    # Start base query
+    base_query = '''
+        SELECT file.*, u."Name"
+        FROM "UMRepo"."file" AS file
+        JOIN "UMRepo"."User" AS u ON u.user_id = file.uploader
+    '''
+
+    conditions = []
+    values = []
+
+    # Filters (POST search)
     if request.method == "POST":
-        if request.form.get("favourites","") != 'on':
-        
-            if request.form.get("material_type") is None and request.form.get("search_images") is None:
-                find_record = (f"""select * from "UMRepo"."file" """)
-                cursor.execute(find_record)
-                files = cursor.fetchall()
-            elif request.form.get("material_type") is None:
-                filter_records=(f"""select * from "UMRepo"."file" WHERE levenshtein(name, %s) < 5;""")
-                cursor.execute(filter_records, (request.form.get("search_images"),))
-            elif request.form.get("search_images") is None:
-                filter_records=(f"""select * from "UMRepo"."file" WHERE cat_id = %s;""")
-                cursor.execute(filter_records, (request.form.get("material_type"),))
-            else:
-                filter_records=(f"""select * from "UMRepo"."file" WHERE levenshtein(name, %s) < 5 and cat_id = %s;""")
-                cursor.execute(filter_records, (request.form.get("search_images"),(request.form.get("material_type"),)))
-            files=cursor.fetchall()
-    
+        search = request.form.get("search_images")
+        mat_type = request.form.get("material_type")
+        is_favs = request.form.get("favourites") == 'on'
 
-        
-        
-        else:
-            if request.form.get("material_type") is None and request.form.get("search_images") is None:
-                find_record = (f"""select * from "UMRepo"."file" file join "UMRepo"."favourites" fav on fav.file_id = file.file_id""")
-                cursor.execute(find_record,)
-            elif request.form.get("material_type") is None:
-                filter_records=(f"""select * from "UMRepo"."file" file join "UMRepo"."favourites" fav on fav.file_id = file.file_id  WHERE levenshtein(name, %s) < 5;""")
-                cursor.execute(filter_records, (request.form.get("search_images"),))
-            elif request.form.get("search_images") is None:
-                filter_records=(f"""select * from "UMRepo"."file" file join "UMRepo"."favourites" fav on fav.file_id = file.file_id  WHERE cat_id = %s;""")
-                cursor.execute(filter_records, (request.form.get("material_type"),))
-            else:
-                filter_records=(f"""select * from "UMRepo"."file" file join "UMRepo"."favourites" fav on fav.file_id = file.file_id  WHERE levenshtein(name, %s) < 5 and cat_id = %s;""")
-                cursor.execute(filter_records, (request.form.get("search_images"),(request.form.get("material_type"),)))
-            files=cursor.fetchall()
+        if is_favs and user_id:
+            base_query += ' JOIN "UMRepo"."favourites" fav ON fav.file_id = file.file_id'
+            conditions.append("fav.user_id = %s")
+            values.append(user_id)
+
+        if search:
+            conditions.append("levenshtein(file.name, %s) < 3")
+            values.append(search)
+
+        if mat_type:
+            conditions.append("file.cat_id = %s")
+            values.append(mat_type)
+
+    # Visibility logic
+    if not user_id:
+        conditions.append('file.visibility = %s')
+        values.append("Open Access")
     else:
-        find_record = (f"""select * from "UMRepo"."file" """)
-        cursor.execute(find_record)
-        files = cursor.fetchall()
+        role = session.get("RoleID")
+        if role == 3:
+            pass  # Librarian sees all files
+        elif role == 2:  # Teacher
+            conditions.append('''(
+                file.visibility = %s OR 
+                file.visibility = %s OR 
+                file.file_id IN (
+                    SELECT file_id FROM "UMRepo"."file_access" WHERE user_id = %s
+                ) OR 
+                file.uploader = %s
+            )''')
+            values.extend(["Open Access", "University Only", user_id, user_id])
+        else:  # Students
+            conditions.append('''(
+                file.visibility = %s OR 
+                file.file_id IN (
+                    SELECT file_id FROM "UMRepo"."file_access" WHERE user_id = %s
+                )
+            )''')
+            values.extend(["Open Access", user_id])
 
-    
-    return render_template("repository.html",files=files,categories=categories,favs=favs)
+    # Final query
+    where_clause = " WHERE " + " AND ".join(conditions) if conditions else ""
+    final_query = base_query + where_clause + ";"
+
+    cursor.execute(final_query, tuple(values))
+    files = cursor.fetchall()
+
+    return render_template("repository.html", files=files, categories=categories, favs=favs)
+
+
+
 @app.route("/granted")
 def granted():
     return render_template("granted.html")
 @app.route("/denied")
 def denied():
     return render_template("denied.html")
+@app.route('/assign_access/<int:file_id>', methods=["GET", "POST"])
+def assign_access(file_id):
+    if session.get('RoleID') < 2: 
+        return abort(403)
+
+    cursor = conn.cursor()
+
+    if request.method == "POST":
+        selected_users = request.form.getlist("allowed_users")
+        for user_id in selected_users:
+            cursor.execute('INSERT INTO "UMRepo"."file_access"(file_id, user_id) VALUES (%s, %s)', (file_id, user_id))
+        conn.commit()
+        return redirect('/repo')
+
+    
+    cursor.execute('SELECT user_id, "Name", "Surname" FROM "UMRepo"."User" WHERE "RoleID" = 1 OR "RoleID" = 2')
+    students = cursor.fetchall()
+
+    return render_template("assign_access.html", file_id=file_id, students=students)
+
 @app.route("/upload",methods=["POST","GET"])
 def upload():
     if session['RoleID'] and (session['RoleID']==2 or session['RoleID']==3):
@@ -222,22 +274,22 @@ def upload():
             subject_category = request.form.get('subject_category','').strip()
             if 'file' not in request.files or request.files['file'].filename == '':
                 return "No File Uploaded",400
-            try:
-                uploader_id = session['user_id']
-            except ValueError:
-                return "Invalid uploader ID", 400
+            # try:
+            #     uploader_id = session['user_id']
+            # except ValueError:
+            #     return "Invalid uploader ID", 400
 
                 # Parse upload date
             try:
                     upload_date =request.form['upload_date']
             except ValueError:
                 return "Invalid date format (YYYY-MM-DD required)", 400
-            path = os.path.join(app.config['UPLOAD_FOLDER'],secure_filename())
+            path = os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(name))
             
             new_record = (f"""Insert into "UMRepo"."file"(name,description,path,uploader,upload_date,visibility,cat_id,subject_category)
                 
             values (%s,%s,%s,%s,%s,%s,%s,%s);""")
-            
+            uploader_id=session['user_id']
             
             cursor=conn.cursor()
             
@@ -328,7 +380,11 @@ def upload():
                 
 
             print(recs)
-            
+            if accessibility == "Restricted":
+                cursor.execute('SELECT MAX(file_id) FROM "UMRepo"."file" WHERE uploader = %s', (uploader_id,))
+                file_id = cursor.fetchone()[0]
+                return redirect(url_for('assign_access', file_id=file_id))
+
             return redirect("/thx4upl")
     else:
         return abort(403)
@@ -343,17 +399,17 @@ def thank_you():
 def thank_you_for_uploading():
     return render_template("thankyou4uploading.html")
 
-@app.route("/access_request")
-def access_request():
-    if session['RoleID']  and session['RoleID']==3:
-        cursor = conn.cursor()
-        find_record = (f"""select * from "UMRepo"."pending";""")
-        cursor.execute(find_record)
-        pending = cursor.fetchall()
-        print(pending)
-        return render_template("AccessRequests.html",pending=pending)
-    else:
-        return abort(403)
+# @app.route("/access_request")
+# def access_request():
+#     if session['RoleID']  and session['RoleID']==3:
+#         cursor = conn.cursor()
+#         find_record = (f"""select * from "UMRepo"."pending";""")
+#         cursor.execute(find_record)
+#         pending = cursor.fetchall()
+#         print(pending)
+#         return render_template("AccessRequests.html",pending=pending)
+#     else:
+#         return abort(403)
 @app.route("/handle_request",methods=["POST"])
 def handle_request():
     id = request.form.get('request_id')
@@ -367,6 +423,7 @@ def handle_request():
     cursor = conn.cursor()
     cursor.execute(select_record,(id,))
     rec = cursor.fetchone()
+    
     print(rec)
     if action =='accept':
         cursor.execute(new_record,(rec[0],rec[1],rec[2],rec[3],rec[5]))
@@ -400,29 +457,214 @@ def logout():
 def download(filepath):
     filename = filepath.split("\\")[-1]
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
-@app.route('/toggle_favourite/<int:file_id>',methods=["GET"])
-def toggle_favourite(file_id):
-    user_id = session.get('user_id')
+@app.route('/filter/<int:type>')
+def filter(type):
+    cursor = conn.cursor()
+    filter_records = (f'Select * from "UMRepo"."file" WHERE cat_id = %s ')
+    cursor.execute('select * from "UMRepo"."Category"')
+    categories = cursor.fetchall()
+    check = """SELECT "file_id" FROM "UMRepo"."favourites" WHERE user_id = %s"""
+    cursor.execute(check, (session["user_id"],))
+    favs = [row[0] for row in cursor.fetchall()]
+    cursor.execute(filter_records,(type,))
+    files = cursor.fetchall()
+    return render_template("repository.html",files=files,categories=categories,favs=favs)
+@app.route('/filter_favs')
+def filter_favs():
+    user_id = session.get("user_id")
     if not user_id:
         return abort(403)
 
     cursor = conn.cursor()
-    check = """SELECT * FROM "UMRepo"."favourites" WHERE user_id = %s AND file_id = %s"""
-    cursor.execute(check, (user_id, file_id))
-    fav = cursor.fetchone()
+    cursor.execute('SELECT * FROM "UMRepo"."Category"')
+    categories = cursor.fetchall()
 
-    if fav:
-        # Already favourited → remove it
-        delete = """DELETE FROM "UMRepo"."favourites" WHERE user_id = %s AND file_id = %s"""
-        cursor.execute(delete, (user_id, file_id))
+    # Only get favorites for the current user
+    query = '''
+        SELECT file.*, u."Name"
+        FROM "UMRepo"."file" file
+        JOIN "UMRepo"."favourites" fav ON fav.file_id = file.file_id
+        JOIN "UMRepo"."User" u ON u.user_id = file.uploader
+        WHERE fav.user_id = %s
+    '''
+    cursor.execute(query, (user_id,))
+    files = cursor.fetchall()
+
+    # Fetch user's favorites to highlight hearts
+    fav_ids = [row[0] for row in files]  # or another query if needed
+
+    return render_template("repository.html", files=files, categories=categories, favs=fav_ids)
+
+
+
+
+@app.route('/toggle_favourite/<int:file_id>')
+def toggle_favourite(file_id):
+    if not session.get('user_id'):
+        return abort(403)
+    user_id = session.get('user_id')
+
+    cursor = conn.cursor()
+    check_query = '''SELECT 1 FROM "UMRepo"."favourites" WHERE user_id = %s AND file_id = %s'''
+    cursor.execute(check_query, (user_id, file_id))
+    is_fav = cursor.fetchone()
+
+    if is_fav:
+        delete_query = '''DELETE FROM "UMRepo"."favourites" WHERE user_id = %s AND file_id = %s'''
+        cursor.execute(delete_query, (user_id, file_id))
     else:
-        # Not favourited → add it
-        insert = """INSERT INTO "UMRepo"."favourites"(user_id, file_id) VALUES (%s, %s)"""
-        cursor.execute(insert, (user_id, file_id))
+        insert_query = '''INSERT INTO "UMRepo"."favourites"(user_id, file_id) VALUES (%s, %s)'''
+        cursor.execute(insert_query, (user_id, file_id))
 
     conn.commit()
-    print(session)
-    return redirect("/repo")
+    return redirect(url_for('repo'))
+
+@app.route("/access_request")
+def access_request():
+    if session.get('RoleID') != 3:
+        return abort(403)
+
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM "UMRepo"."pending";')
+    pending = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM "UMRepo"."User" WHERE user_id != %s;', (session["user_id"],))
+    users = cursor.fetchall()
+
+    return render_template("AccessRequests.html", pending=pending, users=users)
+
+
+@app.route('/promote_demote', methods=['POST'])
+def promote_demote():
+    if session.get('RoleID') != 3:
+        return abort(403)
+
+    user_id = int(request.form.get("target_user_id"))
+    action = request.form.get("action")
+
+    if user_id == session.get("user_id"):
+        return abort(403)
+
+    cursor = conn.cursor()
+    cursor.execute('SELECT "RoleID" FROM "UMRepo"."User" WHERE user_id = %s', (user_id,))
+    current_role = cursor.fetchone()[0]
+
+    new_role = None
+    if action == "promote":
+        if current_role == 1:
+            new_role = 2
+        elif current_role == 2:
+            new_role = 3
+    elif action == "demote":
+        if current_role == 3:
+            new_role = 2
+        elif current_role == 2:
+            new_role = 1
+
+    if new_role:
+        cursor.execute('UPDATE "UMRepo"."User" SET "RoleID" = %s WHERE user_id = %s', (new_role, user_id))
+        conn.commit()
+
+    return redirect("/access_request")
+
+
+@app.route("/update_role", methods=["POST"])
+def update_role():
+    if session.get('RoleID') != 3:
+        return abort(403)
+
+    user_id = int(request.form.get("user_id"))
+    action = request.form.get("action")
+
+    # Prevent user from changing themselves
+    if user_id == session.get("user_id"):
+        return abort(403)
+
+    cursor = conn.cursor()
+    cursor.execute('SELECT "RoleID" FROM "UMRepo"."User" WHERE user_id = %s', (user_id,))
+    current_role = cursor.fetchone()[0]
+
+    # Role transition logic
+    new_role = current_role
+    if action == "promote":
+        if current_role == 1:
+            new_role = 2  # Student → Teacher
+        elif current_role == 2:
+            new_role = 3  # Teacher → Librarian
+    elif action == "demote":
+        if current_role == 2:
+            new_role = 1  # Teacher → Student
+        elif current_role == 3:
+            new_role = 2  # Librarian → Teacher
+
+    cursor.execute('UPDATE "UMRepo"."User" SET "RoleID" = %s WHERE user_id = %s', (new_role, user_id))
+    conn.commit()
+    return redirect("/access_request")
+
+@app.route('/my_uploads')
+def my_uploads():
+    if session.get('RoleID') not in [2, 3]:
+        return abort(403)  # Only teachers or librarians
+
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT file.*, c."cat_name"
+        FROM "UMRepo"."file" file
+        JOIN "UMRepo"."Category" c ON c.cat_id = file.cat_id
+        WHERE file.uploader = %s;
+    ''', (session["user_id"],))
+    uploads = cursor.fetchall()
+
+    return render_template('my_uploads.html', uploads=uploads)
+
+@app.route('/edit_upload/<int:file_id>', methods=['GET', 'POST'])
+def edit_upload(file_id):
+    if session.get('RoleID') not in [2, 3]:
+        return abort(403)
+
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        name = request.form['name']
+        description = request.form['description']
+        visibility = request.form['visibility']
+        cursor.execute('''
+            UPDATE "UMRepo"."file" 
+            SET name = %s, description = %s, visibility = %s 
+            WHERE file_id = %s AND uploader = %s
+        ''', (name, description, visibility, file_id, session["user_id"]))
+        conn.commit()
+        return redirect('/my_uploads')
+
+    # GET request - fetch current file data
+    cursor.execute('''
+        SELECT name, description, visibility FROM "UMRepo"."file" 
+        WHERE file_id = %s AND uploader = %s
+    ''', (file_id, session["user_id"]))
+    file = cursor.fetchone()
+
+    return render_template('edit_upload.html', file=file, file_id=file_id)
+
+
+    # # GET: Load file info
+    # cursor.execute('''
+    #     SELECT name, description, visibility FROM "UMRepo"."file" 
+    #     WHERE file_id = %s AND uploader = %s
+    # ''', (file_id, session["user_id"]))
+    # file = cursor.fetchone()
+
+    # return render_template('edit_upload.html', file=file, file_id=file_id)
+
+
+    # # GET: Load file info
+    # cursor.execute('''
+    #     SELECT name, description, visibility FROM "UMRepo"."file" 
+    #     WHERE file_id = %s AND uploader = %s
+    # ''', (file_id, session["user_id"]))
+    # file = cursor.fetchone()
+
+    # return render_template('edit_upload.html', file=file, file_id=file_id)
+
 
 if __name__ == '__main__':
 

@@ -20,11 +20,15 @@
     </p>
 
     <div class="mt-4" data-aos="zoom-in" data-aos-delay="600">
-      {% if session.get('name') and session.get('surname') %}
-        <a href="{{ url_for('repo') }}" class="btn btn-danger btn-lg rounded-pill px-4 fw-semibold">📂 Browse Repository</a>
-      {% else %}
-        <a href="{{ url_for('login') }}" class="btn btn-outline-danger btn-lg rounded-pill px-4 fw-semibold">🔑 Log In / Sign Up</a>
-      {% endif %}
+      <div class="mt-4 d-flex justify-content-center gap-3" data-aos="zoom-in" data-aos-delay="600">
+        {% if session.get('name') and session.get('surname') %}
+          <a href="{{ url_for('repo') }}" class="btn btn-danger btn-lg rounded-pill px-4 fw-semibold">📂 Browse Repository</a>
+        {% else %}
+          <a href="{{ url_for('repo') }}" class="btn btn-danger btn-lg rounded-pill px-4 fw-semibold">📂 Browse Repository</a>
+          <a href="{{ url_for('login') }}" class="btn btn-outline-danger btn-lg rounded-pill px-4 fw-semibold">🔑 Log In / Sign Up</a>
+        {% endif %}
+      </div>
+      
     </div>
 
     {% if not session.get('name') %}

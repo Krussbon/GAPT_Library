@@ -51,11 +51,16 @@
       <a class="navbar-brand d-flex align-items-center text-danger fw-bold fs-4" href="{{ url_for('index') }}">
         <img src="{{ url_for('static', filename='images/book-7672463_1280.png') }}" width="32" class="me-2"> AcaRep
       </a>
+      
       <div class="ms-auto d-flex align-items-center gap-3">
         {% if session.get('user_id') %}
           <a class="text-danger fw-semibold" href="{{ url_for('repo') }}">Repository</a>
+          {% if session.get('RoleID') == 3 %}
+            <a class="text-danger fw-semibold" href="{{ url_for('access_request') }}">Access Requests</a>
+          {% endif %}
           <a class="text-danger fw-semibold" href="{{ url_for('logout') }}">Logout</a>
         {% else %}
+          <a class="text-danger fw-semibold" href="{{ url_for('repo') }}">Repository</a>
           <a class="text-danger fw-semibold" href="{{ url_for('login') }}">Login</a>
         {% endif %}
       </div>

@@ -1,80 +1,79 @@
-{% extends "layout.html"%}
-{%block content%}
-        <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
-        <div class="text">
-        <h1 class="text text-align">Repository</h1>
-        
-        <div class="filter-buttons justify-content-center ">
-            
-            <form method="post" enctype="multipart/form-data">
-            <input type="radio" name="material_type" id="material_type" value="1" class="rounded text button">Lecture Notes</input>
-            <input type="radio" name="material_type" id="material_type" value="2" class="rounded text button">Assignment</input>
-            <input type="radio" name="material_type" id="material_type" value="3" class="rounded text button">Exam/Solution</input>
-            <input type="radio" name="material_type" id="material_type" value="4" class="rounded text button">Research Paper</input>
-            <input type="radio" name="material_type" id="material_type" value="5" class="rounded text button">Lab Report</input>
-            <input type="radio" name="material_type" id="material_type" value="6" class="rounded text button">Thesis/Dissertation</input>
-            <input type="radio" name="material_type" id="material_type" value="7" class="rounded text button">Video</input>
-            <input type="radio" name="material_type" id="material_type" value="8" class="rounded text button">Presentation</input>
-            <label for="favourites">Favourites Only</label><input type="checkbox" name="favourites" id="favourites"/>
-            
-                <input name="search_images" id="search_images" type="search"/>
-                <button class="text button" type="submit"> Search
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                  </svg>
-                </button>
-            </form>
-            
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container my-4">
+
+    <!-- Page Header + Upload & My Uploads Button -->
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <h1 class="text-danger fw-bold">Repository</h1>
+        {% if 'RoleID' in session and session['RoleID'] >= 2 %}
+        <div class="d-flex flex-column align-items-end">
+          <a href="{{ url_for('upload') }}" class="btn btn-danger fw-semibold mb-2">+ Upload</a>
+          <a href="{{ url_for('my_uploads') }}" class="btn btn-outline-danger">📁 My Uploads</a>
         </div>
-        </div> 
-        <table style="margin-top:15px; box-shadow: -10px -5px 5px 12px rgba(0,0,0,0.5);" class="text table-bordered repo-table text-align">
-            <tr class="title" >
-                <th>File Name</th>
-                <th>Date Created</th>
-                <th>Subject Category</th>
-                <th>Author(s)</th>
-                <th>Uploaders</th>
-                <th>Availability</th>
-                <th>Material Type</th>
-                <th>Favourite</th>
-                <th></th>
-            </tr>
-            {% for x in files %}
-            <tr>
-                <td>{{ x[0] }}</td>
-                <td>{{ x[4] }}</td>
-                <td>{{ x[8] }}</td>
-                <td>The Author</td>
-                <td>Keith</td>
-                <td>{{ x[5]}}</td>
-                <td>{{categories[x[6]-1][0]}}</td>
-                <td><a href="{{ url_for('toggle_favourite',file_id=x[7])}}" style="background-color:transparent;border-color:transparent;">
-                    {% if x[7] not in favs%}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
-                </svg>
-                {% endif %}
-                {% if x[7] in favs%}
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
-                  </svg>
-                {% endif %}
-                </a></td>
-                
-                <td style="margin-right:15px;  width:200px; "><a href="{{ url_for('download', filepath=x[2] ) }}" class="btn btn-outline-danger rounded-pill text button" style="width:125px; padding:5px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
-                      <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
-                      <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
-                    </svg>
-                    Download
-                  </a></td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% if session['RoleID']>=2 %}
-        <a class="text" href="{{ url_for('upload')}}">Upload</a>
         {% endif %}
+      </div>
+    
+
+  <!-- Filter Buttons -->
+  <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+    {% for i in range(1, 9) %}
+      <a href="{{ url_for('filter', type=i) }}" class="btn btn-outline-danger">{{ categories[i-1][0] }}</a>
+    {% endfor %}
+    <a href="{{ url_for('filter_favs') }}" class="btn btn-outline-danger">Favourites Only</a>
+  </div>
+
+  <!-- Search Form -->
+  <form method="post" class="d-flex justify-content-center mb-4" enctype="multipart/form-data">
+    <input type="search" name="search_images" class="form-control w-50 me-2" placeholder="Search by name">
+    <button type="submit" class="btn btn-outline-danger">Search</button>
+  </form>
+
+  <div class="table-wrapper">
+    <table class="table repo-table text-center">
+      <thead>
+        <tr>
+          <th>File Name</th>
+          <th>Date Created</th>
+          <th>Subject Category</th>
+          <th>Uploaders</th>
+          <th>Availability</th>
+          <th>Material Type</th>
+          <th>Favourite</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for x in files %}
+        <tr>
+          <td>{{ x[0] }}</td>
+          <td>{{ x[4] }}</td>
+          <td>{{ x[8] }}</td>
+          
+          <td>{{ x[-1]}}</td>
+          <td>{{ x[5] }}</td>
+          <td>{{ categories[x[6]-1][0] }}</td>
+          <td>
+            <a href="{{ url_for('toggle_favourite', file_id=x[7]) }}" class="favourite-icon">
+              {% if x[7] not in favs %}
+                🤍
+              {% else %}
+                ❤️
+              {% endif %}
+            </a>
+          </td>
+          <td>
+            <a href="{{ url_for('download', filepath=x[2]) }}" class="btn btn-danger btn-sm rounded-pill px-3 py-1">
+              <i class="bi bi-download"></i> Download
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+ 
+</div>
+
 {% endblock %}
-     
