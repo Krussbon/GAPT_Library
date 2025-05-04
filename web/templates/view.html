@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container my-5">
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-body p-5">
+      <h2 class="text-danger text-center mb-4">📄 File Details</h2>
+
+      <!-- File Overview -->
+      <div class="mb-3">
+        <strong class="text-danger">Name:</strong> {{ file_info[1] }}
+      </div>
+      <div class="mb-3">
+        <strong class="text-danger">Description:</strong> {{ file_info[2] }}
+      </div>
+      <div class="mb-3">
+        <strong class="text-danger">Uploaded By:</strong> {{ file_info[-2] }} {{ file_info[-1] }}
+      </div>
+      <div class="mb-3">
+        <strong class="text-danger">Upload Date:</strong> {{ file_info[4] }}
+      </div>
+      <div class="mb-3">
+        <strong class="text-danger">Visibility:</strong> {{ file_info[5] }}
+      </div>
+      <div class="mb-3">
+        <strong class="text-danger">Subject Category:</strong> {{ file_info[8] }}
+      </div>
+      <div class="mb-4">
+        <strong class="text-danger">Material Type:</strong>
+        {% set cat_map = {
+          1: "Lecture Notes",
+          2: "Assignment",
+          3: "Exam/Solution",
+          4: "Research Paper",
+          5: "Lab Report",
+          6: "Thesis/Dissertation",
+          7: "Video",
+          8: "Presentation"
+        } %}
+        {{ cat_map.get(file_info[6], "Unknown") }}
+      </div>
+
+      <!-- Meta Information (if any) -->
+      {% if cat_map.get(file_info[6]) == "Lecture Notes" %}
+      <div class="alert alert-light border-start border-4 border-danger">
+        <strong>Metadata:</strong><br>
+        Course Name: {{ attributes[0][1] }}<br>
+        Lecturer Name: {{ attributes[1][1] }}<br>
+        Semester: {{ attributes[2][1] }}<br>
+        Year: {{ attributes[3][1] }}<br>
+        Topic: {{ attributes[4][1] }}
+      </div>
+      {% elif cat_map.get(file_info[6]) == "Assignment" %}
+      <div class="alert alert-light border-start border-4 border-danger">
+        <strong>Metadata:</strong><br>
+        Course Name: {{ attributes[0][1] }}<br>
+        Assignment #: {{ attributes[1][1] }}<br>
+        Due Date: {{ attributes[2][1] }}<br>
+        Instructor: {{ attributes[3][1] }}<br>
+        Year: {{ attributes[4][1] }}
+      </div>
+      {% elif cat_map.get(file_info[6]) == "Exam/Solution" %}
+      <div class="alert alert-light border-start border-4 border-danger">
+        <strong>Metadata:</strong><br>
+        Course Name: {{ attributes[0][1] }}<br>
+        Exam Type: {{ attributes[1][1] }}<br>
+        Year: {{ attributes[2][1] }}<br>
+        Due Date: {{ attributes[3][1] }}<br>
+        Instructor: {{ attributes[4][1] }}<br>
+        Duration: {{ attributes[5][1] }}
+      </div>
+      {% elif cat_map.get(file_info[6]) == "Research Paper" %}
+      <div class="alert alert-light border-start border-4 border-danger">
+        <strong>Metadata:</strong><br>
+        Title: {{ attributes[0][1] }}<br>
+        Authors: {{ attributes[1][1] }}<br>
+        Publication Year: {{ attributes[2][1] }}<br>
+        Journal/Conference: {{ attributes[3][1] }}
+      </div>
+      {% elif cat_map.get(file_info[6]) == "Lab Report" %}
+      <div class="alert alert-light border-start border-4 border-danger">
+        <strong>Metadata:</strong><br>
+        Experiment Title: {{ attributes[0][1] }}<br>
+        Subject: {{ attributes[1][1] }}<br>
+        Instructor: {{ attributes[2][1] }}<br>
+        Lab Partners: {{ attributes[3][1] }}
+      </div>
+      {% elif cat_map.get(file_info[6]) == "Thesis/Dissertation" %}
+      <div class="alert alert-light border-start border-4 border-danger">
+        <strong>Metadata:</strong><br>
+        Student Name: {{ attributes[0][1] }}<br>
+        Supervisor: {{ attributes[1][1] }}<br>
+        Department: {{ attributes[2][1] }}<br>
+        Year: {{ attributes[3][1] }}<br>
+        Abstract: {{ attributes[5][1] }}<br>
+        Degree Level: {{ attributes[6][1] }}
+      </div>
+      {% elif cat_map.get(file_info[6]) == "Video" %}
+      <div class="alert alert-light border-start border-4 border-danger">
+        <strong>Metadata:</strong><br>
+        Course Name: {{ attributes[0][1] }}<br>
+        Instructor: {{ attributes[1][1] }}<br>
+        Duration: {{ attributes[2][1] }}<br>
+        Topic: {{ attributes[3][1] }}<br>
+        Title: {{ attributes[4][1] }}
+      </div>
+      {% elif cat_map.get(file_info[6]) == "Presentation" %}
+      <div class="alert alert-light border-start border-4 border-danger">
+        <strong>Metadata:</strong><br>
+        Title: {{ attributes[0][1] }}<br>
+        Speaker Name: {{ attributes[1][1] }}<br>
+        Course/Event: {{ attributes[2][1] }}<br>
+        Date Presented: {{ attributes[3][1] }}<br>
+        Topic: {{ attributes[4][1] }}
+      </div>
+      <div class="alert alert-light border-start border-4 border-danger">
+        {% if attributes and attributes|length >= 5 %}
+        <!-- your existing metadata blocks -->
+      {% else %}
+        <div class="alert alert-warning text-center">
+          No metadata available for this material.
+        </div>
+      {% endif %}
+      
+      {% endif %}
+
+      
+
+<div class="text-center mt-3">
+  <a href="{{ url_for('my_uploads') }}" class="btn btn-outline-danger btn-lg rounded-pill px-4">
+    ⬅ Back to My Uploads
+  </a>
+</div>
+
+
+{% endblock %}

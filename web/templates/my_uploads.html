@@ -1,5 +1,7 @@
-<h2 class="text-danger mt-4">My Uploaded Materials</h2>
-<div class="table-responsive">
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="text-danger mt-4 text">My Uploaded Materials</h2>
+<div class="table-responsive text">
   <table class="table table-bordered">
     <thead class="table-danger">
       <tr>
@@ -14,12 +16,15 @@
       <tr>
         <td>{{ file[0] }}</td>
         <td>{{ file[-1] }}</td> <!-- assuming last index is category_name -->
-        <td>{{ file[6] }}</td>
+        <td>{{ file[5] }}</td>
         <td>
           <a href="{{ url_for('edit_upload', file_id=file[7]) }}" class="btn btn-sm btn-outline-danger">Edit</a>
+          <a href="{{ url_for('delete_upload', file_id=file[7]) }}" class="btn btn-sm btn-outline-danger">Delete</a>
+          <a href="{{ url_for('view', file_id=file[7]) }}" class="btn btn-sm btn-outline-danger">View</a>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
+{%endblock %}

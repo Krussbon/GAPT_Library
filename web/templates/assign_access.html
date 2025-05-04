@@ -1,16 +1,49 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2 class="mt-4 text-danger">Assign Access to Restricted File</h2>
-<form method="POST">
-  <input type="hidden" name="file_id" value="{{ file_id }}">
-  {% for s in students %}
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" name="allowed_users" value="{{ s[0] }}" id="student{{ s[0] }}">
-      <label class="form-check-label" for="student{{ s[0] }}">
-        {{ s[1] }} {{ s[2] }}
-      </label>
-    </div>
-  {% endfor %}
-  <button class="btn btn-danger mt-3" type="submit">Save Access</button>
-</form>
+
+<div class="container my-5">
+  <div class="card shadow-lg p-4">
+    <h2 class="text-danger mb-4"> Assign Access to Restricted File</h2>
+
+    <!-- Search bar -->
+    <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search by name..." onkeyup="filterUsers()">
+
+    <form method="POST">
+      <input type="hidden" name="file_id" value="{{ file_id }}">
+
+      <!-- Scrollable user list -->
+      <div class="user-list" style="max-height: 300px; overflow-y: auto;">
+        {% for s in students %}
+        <div class="form-check user-entry py-2 px-3 border-bottom">
+          <input class="form-check-input" type="checkbox" name="allowed_users" value="{{ s[0] }}" id="student{{ s[0] }}">
+          <label class="form-check-label ms-2" for="student{{ s[0] }}">
+            {{ s[1] }} {{ s[2] }}
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Submit -->
+      <div class="text-end mt-4">
+        <button class="btn btn-danger rounded-pill px-4 py-2" type="submit">
+           Save Access
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- JavaScript: Search functionality -->
+<script>
+  function filterUsers() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const entries = document.querySelectorAll(".user-entry");
+
+    entries.forEach(entry => {
+      const name = entry.textContent.toLowerCase();
+      entry.style.display = name.includes(input) ? "block" : "none";
+    });
+  }
+</script>
+
 {% endblock %}

@@ -1,0 +1,175 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container d-flex justify-content-center align-items-center my-5">
+  <div class="col-md-6 bg-white p-4 rounded shadow">
+    <h2 class="text-danger text-center mb-4">Edit Upload</h2>
+
+    <form method="POST">
+      <!-- Name -->
+      <div class="mb-3">
+        <label class="form-label text-danger">Name</label>
+        <input type="text" class="form-control" name="name" value="{{ file[0] }}" required>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-3">
+        <label class="form-label text-danger">Description</label>
+        <textarea class="form-control" name="description" rows="3" required>{{ file[1] }}</textarea>
+      </div>
+
+      <!-- Accessibility -->
+      <div class="mb-3">
+        <label class="form-label text-danger">Accessibility</label><br>
+        {% for option in ['Open Access', 'University Only', 'Restricted'] %}
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="visibility" value="{{ option }}"
+                  {% if file[2] == option %}checked{% endif %}>
+            <label class="form-check-label">{{ option }}</label>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Material Type -->
+      <div class="mb-3">
+        <label class="form-label text-danger">Material Type</label>
+        <select name="material_type" id="material_type" class="form-select" onchange="updateFormFields()" required>
+          <option value="1">Lecture Notes</option>
+          <option value="2">Assignment</option>
+          <option value="3">Exam/Solution</option>
+          <option value="4">Research Paper</option>
+          <option value="5">Lab Report</option>
+          <option value="6">Thesis/Dissertation</option>
+          <option value="7">Video</option>
+          <option value="8">Presentation</option>
+        </select>
+      </div>
+
+      <!-- Subject Category -->
+      <div class="mb-3">
+        <label for="subject_category" class="form-label text-danger">Subject Category</label>
+        <select name="subject_category" id="subject_category" class="form-select" required>
+          <option value="Humanities">Humanities</option>
+          <option value="Theatre">Theatre</option>
+          <option value="Computer Science">Computer Science</option>
+          <option value="Law">Law</option>
+          <option value="Music">Music</option>
+          <option value="Physics">Physics</option>
+          <option value="Chemistry">Chemistry</option>
+          <option value="Biology">Biology</option>
+          <option value="Psychology">Psychology</option>
+          <option value="Sociology">Sociology</option>
+          <option value="Theology">Theology</option>
+        </select>
+      </div>
+
+      <!-- Dynamic Attributes -->
+      <div id="attribute_fields" class="mb-3"></div>
+
+      <!-- Submit -->
+      <div class="d-grid">
+        <button type="submit" class="btn btn-danger">Save Changes</button>
+      </div>
+    </form>
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+      <a href="{{ url_for('my_uploads') }}" class="btn btn-outline-danger btn-lg rounded-pill px-4">
+        ⬅ Back to My Uploads
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- JavaScript for dynamic attribute rendering -->
+<script>
+function updateFormFields() {
+  let materialType = document.getElementById('material_type').value;
+  const dynamicFields = document.getElementById('attribute_fields');
+  dynamicFields.innerHTML = '';
+
+  const fieldTemplate = (label, name, type = 'text') => `
+    <div class="mb-3">
+      <label for="${name}" class="form-label text-danger">${label}</label>
+      <input id="${name}" name="${name}" type="${type}" class="form-control" required>
+    </div>
+  `;
+
+  switch(materialType) {
+    case '1': // Lecture Notes
+      dynamicFields.innerHTML = 
+        fieldTemplate("Course Name", "Course Name") +
+        fieldTemplate("Lecturer Name", "Lecturer Name") +
+        fieldTemplate("Semester", "Semester", "number") +
+        fieldTemplate("Year", "Year", "number") +
+        fieldTemplate("Topic", "Topic");
+      break;
+
+    case '2': // Assignment
+      dynamicFields.innerHTML = 
+        fieldTemplate("Course Name", "Course Name") +
+        fieldTemplate("Assignment Number", "Assignment Number", "number") +
+        fieldTemplate("Due Date", "Due Date", "date") +
+        fieldTemplate("Instructor Name", "Instructor Name") +
+        fieldTemplate("Year", "Year", "number");
+      break;
+
+    case '3': // Exam/Solution
+      dynamicFields.innerHTML = 
+        fieldTemplate("Course Name", "Course Name") +
+        fieldTemplate("Exam Type", "Exam Type") +
+        fieldTemplate("Year", "Year") +
+        fieldTemplate("Instructor", "Instructor") +
+        fieldTemplate("Duration (hrs)", "Duration", "number");
+      break;
+
+    case '4': // Research Paper
+      dynamicFields.innerHTML = 
+        fieldTemplate("Title", "Title") +
+        fieldTemplate("Authors", "Authors") +
+        fieldTemplate("Publication Year", "Publication Year", "number") +
+        fieldTemplate("Journal/Conference Name", "Journal/Conference Name");
+      break;
+
+    case '5': // Lab Report
+      dynamicFields.innerHTML = 
+        fieldTemplate("Experiment Title", "Experiment Title") +
+        fieldTemplate("Subject", "Subject") +
+        fieldTemplate("Instructor", "Instructor") +
+        fieldTemplate("Lab Partners", "Lab Partners");
+      break;
+
+    case '6': // Thesis/Dissertation
+      dynamicFields.innerHTML = 
+        fieldTemplate("Title", "Title") +
+        fieldTemplate("Student Name", "Student Name") +
+        fieldTemplate("Supervisor", "Supervisor") +
+        fieldTemplate("Department", "Department") +
+        fieldTemplate("Year", "Year", "number") +
+        fieldTemplate("Abstract", "Abstract") +
+        fieldTemplate("Degree Level", "Degree Level");
+      break;
+
+    case '7': // Video
+      dynamicFields.innerHTML = 
+        fieldTemplate("Course Name", "Course Name") +
+        fieldTemplate("Title", "Title") +
+        fieldTemplate("Instructor", "Instructor") +
+        fieldTemplate("Duration", "Duration", "number") +
+        fieldTemplate("Topic", "Topic");
+      break;
+
+    case '8': // Presentation
+      dynamicFields.innerHTML = 
+        fieldTemplate("Title", "Title") +
+        fieldTemplate("Speaker Name", "Speaker Name") +
+        fieldTemplate("Event/Course Name", "Course Name") +
+        fieldTemplate("Date Presented", "Date Presented", "date") +
+        fieldTemplate("Topic", "Topic");
+      break;
+  }
+}
+</script>
+
+{% endblock %}

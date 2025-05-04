@@ -1,54 +1,98 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h1 class="text-danger fw-bold mt-4">Access Approval Panel</h1>
-<div class="row">
-  {% for x in pending %}
-  <div class="col-md-4 mb-3">
-    <div class="card shadow-sm p-3">
-      <h5 class="fw-semibold">{{ x[0] }} {{ x[1] }}</h5>
-      <p class="text-muted mb-1">{{ x[2] }}</p>
-      <form method="post" action="/handle_request">
-        <input type="hidden" name="request_id" value="{{ x[6] }}">
-        <button class="btn btn-success btn-sm rounded-pill" name="action" value="accept">Accept</button>
-        <button class="btn btn-outline-danger btn-sm rounded-pill" name="action" value="deny">Deny</button>
-      </form>
+<div class="container my-4">
+  <h2 class="text-danger fw-bold mb-4">Access Approval Panel</h2>
+
+  <div class="row mb-4">
+    {% for user in pending %}
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm p-3 rounded-4">
+        <h5 class="fw-semibold">{{ user[0] }} {{ user[1] }}</h5>
+        <p class="text-muted">{{ user[2] }}</p>
+        <form method="post" action="/handle_request">
+          <input type="hidden" name="request_id" value="{{ user[6] }}">
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-success btn-sm rounded-pill px-3" name="action" value="accept">✔ Accept</button>
+            <button class="btn btn-outline-danger btn-sm rounded-pill px-3" name="action" value="deny">✖ Deny</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <hr class="my-4">
+
+  <h2 class="text-danger fw-bold mb-4">Promotion / Demotion Panel</h2>
+
+  <!-- Filter Controls -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <input id="userSearch" class="form-control rounded-pill" placeholder=" Search by name or email" onkeyup="filterUsers()">
+    </div>
+    <div class="col-md-4">
+      <select class="form-select rounded-pill" id="roleFilter" onchange="filterUsers()">
+        <option value="">All Roles</option>
+        <option value="Student">Student</option>
+        <option value="Teacher">Teacher</option>
+        <option value="Librarian">Librarian</option>
+      </select>
     </div>
   </div>
-  {% endfor %}
-</div>
 
-<hr class="my-4">
-
-<h1 class="text-danger fw-bold">Promotion/Demotion Panel</h1>
-<div class="row">
-  {% for user in users %}
-  {% if user[5] != session['user_id'] %}
-  <div class="col-md-4 mb-3">
-    <div class="card bg-light border-danger shadow-sm p-3 h-100">
-      <h5 class="fw-semibold">{{ user[1] }} {{ user[2] }}</h5>
-      <p class="text-muted mb-1">{{ user[3] }}</p>
-      <p><strong>Role:</strong>
-        {% if user[6] == 1 %} Student
-        {% elif user[6] == 2 %} Teacher
-        {% elif user[6] == 3 %} Librarian
-        {% endif %}
-      </p>
-      <form method="POST" action="/promote_demote">
-        <input type="hidden" name="target_user_id" value="{{ user[5] }}">
-        {% if user[6] == 1 %}
-        <button class="btn btn-danger btn-sm rounded-pill" name="action" value="promote">Promote to Teacher</button>
-        {% elif user[6] == 2 %}
-        <button class="btn btn-danger btn-sm rounded-pill mb-1" name="action" value="promote">Promote to Librarian</button>
-        <button class="btn btn-outline-dark btn-sm rounded-pill" name="action" value="demote">Demote to Student</button>
-        {% elif user[6] == 3 %}
-        <button class="btn btn-outline-dark btn-sm rounded-pill" name="action" value="demote">Demote to Teacher</button>
-        {% endif %}
-      </form>
+  <!-- User Cards -->
+  <div class="row" id="userCards">
+    {% for user in users %}
+    {% if user[5] != session['user_id'] %}
+    {% set role_text = "Student" if user[6]==1 else "Teacher" if user[6]==2 else "Librarian" %}
+    <div class="col-md-4 mb-4 user-card" data-role="{{ role_text }}" data-name="{{ user[1] }} {{ user[2] }}" data-email="{{ user[3] }}">
+      <div class="card border-0 shadow-lg p-3 rounded-4 bg-light h-100">
+        <h5 class="fw-semibold">{{ user[1] }} {{ user[2] }}</h5>
+        
+        <p><strong>Role:</strong> {{ role_text }}</p>
+        <form method="POST" action="/promote_demote" onsubmit="return confirmAction(this)">
+          <input type="hidden" name="target_user_id" value="{{ user[5] }}">
+          {% if user[6] == 1 %}
+            <button class="btn btn-danger btn-sm rounded-pill px-3" name="action" value="promote">Promote to Teacher</button>
+          {% elif user[6] == 2 %}
+            <button class="btn btn-danger btn-sm rounded-pill mb-1 px-3" name="action" value="promote">Promote to Librarian</button>
+            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" name="action" value="demote">Demote to Student</button>
+          {% elif user[6] == 3 %}
+            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" name="action" value="demote">Demote to Teacher</button>
+          {% endif %}
+        </form>
+      </div>
     </div>
+    {% endif %}
+    {% endfor %}
   </div>
-  {% endif %}
-  {% endfor %}
 </div>
+
+<!-- JS for Filtering + Confirmation -->
+<script>
+  function filterUsers() {
+    const searchInput = document.getElementById("userSearch").value.toLowerCase();
+    const roleFilter = document.getElementById("roleFilter").value;
+    const cards = document.querySelectorAll(".user-card");
+
+    cards.forEach(card => {
+      const name = card.dataset.name.toLowerCase();
+      const email = card.dataset.email.toLowerCase();
+      const role = card.dataset.role;
+
+      const matchesSearch = name.includes(searchInput) || email.includes(searchInput);
+      const matchesRole = !roleFilter || role === roleFilter;
+
+      card.style.display = (matchesSearch && matchesRole) ? "block" : "none";
+    });
+  }
+
+  function confirmAction(form) {
+    const action = form.querySelector('[name="action"]').value;
+    const name = form.closest('.card').querySelector('h5').innerText;
+    return confirm(`Are you sure you want to ${action} ${name}?`);
+  }
+</script>
 
 {% endblock %}

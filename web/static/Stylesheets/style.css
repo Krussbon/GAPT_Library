@@ -193,18 +193,4 @@ footer {
   }
   
 
-  .btn-outline-danger {
-    border: 2px solid #c00000;
-    transition: all 0.2s ease-in-out;
-  }
-  
-  .btn-outline-danger:hover {
-    background-color: #c00000;
-    color: white;
-  }
-  
-  .btn-danger {
-    background-color: #c00000;
-    border: none;
-  }
   
