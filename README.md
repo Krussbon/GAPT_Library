@@ -38,41 +38,12 @@ IDE: Visual Studio Code
 
 # 📋 How to Run the Project Locally
 
-- Backend Setup:
+clone the project to your local directory
 
-Install Python dependencies:
+in the cloned folder, run the file "backendlogic.py"
 
-bash
-Copy
-Edit
-pip install -r requirements.txt
-Configure your database connection in the backend.
+it should give you two ip addresses in the terminal upon running 
 
-- Run the Backend:
-
-bash
-Copy
-Edit
-python app.py
-Frontend Setup:
-
-Navigate to the frontend folder.
-
-- Install React dependencies:
-
-bash
-Copy
-Edit
-npm install
-
-- Start the frontend server:
-
-bash
-Copy
-Edit
-npm start
-Access the App:
-
-- Open your browser and visit: 
+hit ctrl+left click on one of the ip addresses and add /index at the end, doing so will take you to the website
 
 # 🎉 Thank you for checking out the Academic Repository Project!
