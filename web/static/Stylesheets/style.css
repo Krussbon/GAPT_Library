@@ -193,4 +193,13 @@ footer {
   }
   
 
+  .table th, .table td {
+    vertical-align: middle;
+  }
+  .btn-sm {
+    font-size: 0.85rem;
+  }
+  .table-hover tbody tr:hover {
+    background-color: #fff3f3;
+  }
   

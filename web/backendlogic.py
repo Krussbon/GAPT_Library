@@ -307,7 +307,42 @@ def upload():
             cursor.execute(find_records,(cat_id,))
             recs = cursor.fetchall()
             cursor.execute("""select max(file_id) from "UMRepo"."file"  """)
+            new_cat_id = int(request.form['material_type'])
             maximum = cursor.fetchone()[0]
+            start = 1
+            attrs = []
+
+            if new_cat_id == 1:
+                start = 1
+                attrs = [request.form.get(k) for k in ["Course Name", "Lecturer Name", "Semester", "Year", "Topic"]]
+            elif new_cat_id == 2:
+                start = 6
+                attrs = [request.form.get(k) for k in ["Course Name", "Assignment Number", "Due Date", "Instructor Name", "Year"]]
+            elif new_cat_id == 3:
+                start = 23
+                attrs = [request.form.get(k) for k in ["Course Name", "Exam Type", "Year", "Due Date", "Instructor", "Duration"]]
+            elif new_cat_id == 4:
+                start = 39
+                attrs = [request.form.get(k) for k in ["Title", "Authors", "Publication Year", "Journal/Conference Name"]]
+            elif new_cat_id == 5:
+                start = 11
+                attrs = [request.form.get(k) for k in ["Experiment Title", "Subject", "Instructor", "Lab Partners"]]
+            elif new_cat_id == 6:
+                start = 16
+                attrs = [request.form.get(k) for k in ["Title", "Student Name", "Supervisor", "Department", "Year", "Abstract", "Degree Level"]]
+            elif new_cat_id == 7:
+                start = 33
+                attrs = [request.form.get(k) for k in ["Course Name", "Instructor", "Duration", "Topic", "Title"]]
+            elif new_cat_id == 8:
+                start = 28
+                attrs = [request.form.get(k) for k in ["Title", "Speaker Name", "Course Name", "Date Presented", "Topic"]]
+            cursor.execute('SELECT MAX(file_id) FROM "UMRepo"."file"')
+            file_id = cursor.fetchone()[0]
+            new_record = '''INSERT INTO "UMRepo"."file_attributes"(file_id, attr_id, value) VALUES (%s, %s, %s);'''
+            for i, value in enumerate(attrs):
+                cursor.execute(new_record, (file_id, start + i, value))
+
+            conn.commit()
             
 
 
@@ -549,7 +584,7 @@ def my_uploads():
         WHERE file.uploader = %s;
     ''', (session["user_id"],))
     uploads = cursor.fetchall()
-
+    print(uploads)
     return render_template('my_uploads.html', uploads=uploads)
 
 
@@ -582,24 +617,22 @@ def edit_upload(file_id):
         return abort(403)
 
     cursor = conn.cursor()
-    uploader_id=session['user_id']
-    new_record = (f"""Insert into "UMRepo"."file"(name,description,path,uploader,upload_date,visibility,cat_id,subject_category)
-                
-            values (%s,%s,%s,%s,%s,%s,%s,%s);""")
-    # Fetch all categories (material types)
+    uploader_id = session['user_id']
+
+    # Fetch all categories
     cursor.execute('SELECT cat_id, cat_name FROM "UMRepo"."Category"')
     categories = cursor.fetchall()
 
-    # Fetch unique subject categories
+    # Fetch distinct subject categories
     cursor.execute('SELECT DISTINCT subject_category FROM "UMRepo"."file"')
     subject_categories = [row[0] for row in cursor.fetchall()]
 
     # Get current file details
     cursor.execute('''
         SELECT name, description, visibility, cat_id, subject_category 
-        FROM "UMRepo"."file"
+        FROM "UMRepo"."file" 
         WHERE file_id = %s AND uploader = %s
-    ''', (file_id, session["user_id"]))
+    ''', (file_id, uploader_id))
     file = cursor.fetchone()
 
     if not file:
@@ -607,7 +640,7 @@ def edit_upload(file_id):
 
     name, description, visibility, cat_id, subject_category = file
 
-    # Prepare attribute_map for ALL categories
+    # Fetch and prepare all attribute fields
     attribute_map = {}
     for cid, _ in categories:
         cursor.execute('''
@@ -623,7 +656,6 @@ def edit_upload(file_id):
             for attr in attrs
         ]
 
-    # Handle POST
     if request.method == 'POST':
         name = request.form['name']
         description = request.form['description']
@@ -631,100 +663,56 @@ def edit_upload(file_id):
         new_cat_id = int(request.form['material_type'])
         new_subject_category = request.form['subject_category']
 
-        # Update file info
+        # Update file metadata
         cursor.execute('''
             UPDATE "UMRepo"."file"
             SET name = %s, description = %s, visibility = %s, cat_id = %s, subject_category = %s
             WHERE file_id = %s AND uploader = %s
-        ''', (name, description, visibility, new_cat_id, new_subject_category, file_id, session["user_id"]))
+        ''', (name, description, visibility, new_cat_id, new_subject_category, file_id, uploader_id))
 
-        # Delete old attributes
+        # Clear old attributes
         cursor.execute('DELETE FROM "UMRepo"."file_attributes" WHERE file_id = %s', (file_id,))
 
-        # Get the attr_id list for the new category
-        attrs=[]
-        
+        # Parse and insert new attributes based on category
         start = 1
-        if cat_id == 1:
-            course_name = request.form.get("Course Name",'').strip()
-            lecturer_name = request.form.get('Lecturer Name', '').strip()
-            semester = request.form.get('Semester', '').strip()
-            year = request.form.get('Year', '').strip()
-            topic = request.form.get('Topic', '').strip()
-            print(course_name,lecturer_name,semester,year,topic)
-            attrs = [course_name,lecturer_name,semester,year,topic]
-        elif cat_id == 2:
+        attrs = []
+
+        if new_cat_id == 1:
+            start = 1
+            attrs = [request.form.get(k) for k in ["Course Name", "Lecturer Name", "Semester", "Year", "Topic"]]
+        elif new_cat_id == 2:
             start = 6
-            course_name = request.form.get("Course Name",'').strip()
-            assignment_number = request.form.get('Assignment Number', '').strip()
-            due_date = request.form.get('Due Date', '').strip()
-            instructor_name = request.form.get('Instructor Name', '').strip()
-            year = request.form.get('Year', '').strip()
-            attrs = [course_name,assignment_number,due_date,instructor_name,year]
-        elif cat_id == 3:
+            attrs = [request.form.get(k) for k in ["Course Name", "Assignment Number", "Due Date", "Instructor Name", "Year"]]
+        elif new_cat_id == 3:
             start = 23
-            course_name = request.form.get("Course Name",'').strip()
-            exam_type = request.form.get('Exam Type', '').strip()
-            year = request.form.get('Year', '').strip()
-            due_date = datetime.strptime(request.form.get('Due Date', '').strip(), "%Y-%m-%d").date()
-            instructor = request.form.get('Instructor', '').strip()
-            duration = request.form.get("Duration",'').strip()
-            attrs = [course_name,exam_type,year,due_date,instructor,duration]
-        elif cat_id == 4:
+            attrs = [request.form.get(k) for k in ["Course Name", "Exam Type", "Year", "Due Date", "Instructor", "Duration"]]
+        elif new_cat_id == 4:
             start = 39
-            title = request.form.get("Title",'').strip()
-            authors = request.form.get('Authors', '').strip()
-            publication_year = request.form.get('Publication Year', '').strip()
-            p_name = request.form.get('Journal/Conference Name', '').strip()
-            attrs = [title,authors,publication_year,p_name]
-        elif cat_id == 5:
+            attrs = [request.form.get(k) for k in ["Title", "Authors", "Publication Year", "Journal/Conference Name"]]
+        elif new_cat_id == 5:
             start = 11
-            exeriment_title = request.form.get("Experiment Title",'').strip()
-            subject = request.form.get('Subject', '').strip()
-            instructor = request.form.get('instructor', '').strip()
-            lab_partners = request.form.get('Lab Partners', '').strip()
-            attrs = [exeriment_title,subject,instructor,lab_partners]
-        elif cat_id == 6:
+            attrs = [request.form.get(k) for k in ["Experiment Title", "Subject", "Instructor", "Lab Partners"]]
+        elif new_cat_id == 6:
             start = 16
-            title = request.form.get("Title",'').strip()
-            student_name = request.form.get('Student Name', '').strip()
-            supervisor = request.form.get('Supervisor', '').strip()
-            department = request.form.get('Department', '').strip()
-            year = request.form.get('Year', '').strip()
-            abstract = request.form.get("Abstract",'').strip()
-            degree_level = request.form.get('Degree Level', '').strip()
-            attrs = [student_name,supervisor,department,year,year,abstract,degree_level]
-        elif cat_id == 7:
+            attrs = [request.form.get(k) for k in ["Title", "Student Name", "Supervisor", "Department", "Year", "Abstract", "Degree Level"]]
+        elif new_cat_id == 7:
             start = 33
-            course_name = request.form.get("Course Name",'').strip()
-            instructor = request.form.get('Instructor', '').strip()
-            duration = request.form.get('Duration', '').strip()
-            topic = request.form.get('Topic', '').strip()
-            title = request.form.get('Title', '').strip()
-            attrs = [course_name,instructor,duration,topic,title]
-        elif cat_id == 8:
-            start=28
-            title = request.form.get("Title",'').strip()
-            speaker_name = request.form.get('Speaker Name', '').strip()
-            course_name = request.form.get('Course Name', '').strip()
-            date_presented = request.form.get('Date Presented', '').strip()
-            topic = request.form.get('Topic', '').strip()
-            attrs = [title,speaker_name,course_name,date_presented,topic]
-        # Step 1: get the correct file_id just inserted (after commit)
-        cursor.execute('SELECT MAX(file_id) FROM "UMRepo"."file" WHERE uploader = %s', (uploader_id,))
-        file_id = cursor.fetchone()[0]
-        # Step 2: Insert each attribute using the known start ID and file_id
-        new_record = (f"""Insert into "UMRepo"."file_attributes"(file_id,attr_id,value)
-                          values(%s,%s,%s);""")
-        for i, attr in enumerate(attrs):
-            print(f"Attr {i}: ID = {start + i}, Value = {attr}")
-            attr_id = start + i
-            cursor.execute(new_record, (file_id, attr_id, attr))
-            conn.commit()
+            attrs = [request.form.get(k) for k in ["Course Name", "Instructor", "Duration", "Topic", "Title"]]
+        elif new_cat_id == 8:
+            start = 28
+            attrs = [request.form.get(k) for k in ["Title", "Speaker Name", "Course Name", "Date Presented", "Topic"]]
 
-        
+        new_record = '''INSERT INTO "UMRepo"."file_attributes"(file_id, attr_id, value) VALUES (%s, %s, %s);'''
+        for i, value in enumerate(attrs):
+            cursor.execute(new_record, (file_id, start + i, value))
+
+        conn.commit()
+
+        # ✅ Redirect to assign access if visibility is set to Restricted
+        if visibility == "Restricted":
+            return redirect(url_for("assign_access", file_id=file_id))
+
         return redirect(url_for('my_uploads'))
-
 
     return render_template(
         'edit.html',
@@ -736,6 +724,7 @@ def edit_upload(file_id):
         file_subject=subject_category,
         attribute_map=attribute_map
     )
+
 
 
 @app.route('/delete_upload/<int:file_id>', methods=['GET', 'POST'])

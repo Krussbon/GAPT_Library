@@ -1,30 +1,58 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2 class="text-danger mt-4 text">My Uploaded Materials</h2>
-<div class="table-responsive text">
-  <table class="table table-bordered">
-    <thead class="table-danger">
-      <tr>
-        <th>Name</th>
-        <th>Category</th>
-        <th>Visibility</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for file in uploads %}
-      <tr>
-        <td>{{ file[0] }}</td>
-        <td>{{ file[-1] }}</td> <!-- assuming last index is category_name -->
-        <td>{{ file[5] }}</td>
-        <td>
-          <a href="{{ url_for('edit_upload', file_id=file[7]) }}" class="btn btn-sm btn-outline-danger">Edit</a>
-          <a href="{{ url_for('delete_upload', file_id=file[7]) }}" class="btn btn-sm btn-outline-danger">Delete</a>
-          <a href="{{ url_for('view', file_id=file[7]) }}" class="btn btn-sm btn-outline-danger">View</a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+
+<div class="container my-5">
+  <div class="card shadow-lg p-4 rounded-4" style="background: rgba(255,255,255,0.9);">
+    <h2 class="text-danger text-center mb-4 fw-bold">My Uploaded Materials</h2>
+
+    <!-- Search bar -->
+    <div class="mb-4">
+      <input type="text" id="searchInput" class="form-control shadow-sm rounded-pill px-4" placeholder=" Search by name..." onkeyup="filterTable()">
+    </div>
+
+    <!-- Uploads table -->
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered align-middle text-center" id="uploadsTable">
+        <thead class="table-danger text-white">
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Subject Category</th>
+            <th>Visibility</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for file in uploads %}
+          <tr>
+            <td>{{ file[0] }}</td>
+            <td>{{ file[-1] }}</td>
+            <td>{{ file[8] }}</td>
+            <td>{{ file[5] }}</td>
+            <td>
+              <a href="{{ url_for('edit_upload', file_id=file[7]) }}" class="btn btn-sm btn-outline-danger rounded-pill me-1">✏️ Edit</a>
+              <a href="{{ url_for('delete_upload', file_id=file[7]) }}" class="btn btn-sm btn-outline-danger rounded-pill me-1">🗑️ Delete</a>
+              <a href="{{ url_for('view', file_id=file[7]) }}" class="btn btn-sm btn-outline-danger rounded-pill"> View</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
-{%endblock %}
+
+<!-- JavaScript: Filter by name -->
+<script>
+  function filterTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#uploadsTable tbody tr");
+
+    rows.forEach(row => {
+      const nameCell = row.cells[0].textContent.toLowerCase();
+      row.style.display = nameCell.includes(input) ? "" : "none";
+    });
+  }
+</script>
+
+{% endblock %}
