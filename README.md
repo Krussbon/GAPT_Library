@@ -16,7 +16,7 @@ The Academic Repository platform allows:
 
 # 🛠 Tech Stack
 
-Frontend: HTML, CSS, JavaScript (React.js)
+Frontend: HTML, CSS, JavaScript
 
 Backend: Python
 
@@ -38,12 +38,10 @@ IDE: Visual Studio Code
 
 # 📋 How to Run the Project Locally
 
-clone the project to your local directory
+Step 1:Clone the project to your local directory
 
-in the cloned folder, run the file "backendlogic.py"
+Step 2: In the cloned folder, run the file "backendlogic.py", It should give you two ip addresses in the terminal upon running 
 
-it should give you two ip addresses in the terminal upon running 
-
-hit ctrl+left click on one of the ip addresses and add /index at the end, doing so will take you to the website
+Step 3: Hit ctrl+left click on one of the ip addresses and add /index at the end, doing so will take you to the website
 
 # 🎉 Thank you for checking out the Academic Repository Project!
