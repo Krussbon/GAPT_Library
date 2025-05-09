@@ -16,13 +16,34 @@ The Academic Repository platform allows:
 
 # 🛠 Tech Stack
 
-Frontend: HTML, CSS, JavaScript
+ Frontend: HTML + CSS + JavaScript (with Bootstrap for styling and AOS for animations)
 
-Backend: Python
 
-Database: PostgreSQL (managed with pgAdmin)
+ Backend: Python (with Flask). Flask handles routing, session management, user authentication, and database logic.
 
-IDE: Visual Studio Code
+
+ Database: PostgreSQL (managed via psycopg2 for raw SQL queries and SQLAlchemy ORM for model-based interactions)
+
+
+ Tools & Environment:
+
+
+• Visual Studio Code (with extensions for Python, HTML, and PostgreSQL)
+
+
+• GitHub for version control
+
+
+• dotenv for managing environment variables securely
+
+
+• bcrypt for password hashing and secure authentication
+
+
+• Werkzeug for secure URL routing and request handling
+
+
+• Jinja2 for dynamic HTML templating
 
 # 🎯 Key Features
 
