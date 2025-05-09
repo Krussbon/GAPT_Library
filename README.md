@@ -59,10 +59,19 @@ The Academic Repository platform allows:
 
 # 📋 How to Run the Project Locally
 
-Step 1:Clone the project to your local directory
+Step 1: Download the Acarep.sql file
 
-Step 2: In the cloned folder, run the file "backendlogic.py", It should give you two ip addresses in the terminal upon running 
+Step 2: Open Command Prompt Or Powershell and go to path C:\Program Files\PostgreSQL\<VERSION>\bin
+where VERSION is the number
 
-Step 3: Hit ctrl+left click on one of the ip addresses and add /index at the end, doing so will take you to the website
+Step 3: Copy .\createdb -U postgres AcaRep into your terminal and hit Enter
+
+Step 4: Copy .\psql -U postgres -p 5234 -d AcaRep -f "C:\Users\<USER>\Downloads\AcaRep.sql" into your terminal and hit Enter
+
+Step 5:Clone the project to your local directory
+
+Step 6: In the cloned folder, run the file "backendlogic.py", It should give you two ip addresses in the terminal upon running 
+
+Step 7: Hit ctrl+left click on one of the ip addresses and add /index at the end, doing so will take you to the website
 
 #  Thank you for checking out the Academic Repository Project!
