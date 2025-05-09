@@ -65,4 +65,4 @@ Step 2: In the cloned folder, run the file "backendlogic.py", It should give you
 
 Step 3: Hit ctrl+left click on one of the ip addresses and add /index at the end, doing so will take you to the website
 
-# 🎉 Thank you for checking out the Academic Repository Project!
+#  Thank you for checking out the Academic Repository Project!
