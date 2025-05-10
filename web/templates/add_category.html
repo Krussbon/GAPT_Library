@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+  <div class="card p-4 shadow-lg rounded-4">
+    <h2 class="text-danger text-center mb-4 fw-bold">Add New Material Type</h2>
+    <form method="POST">
+      <!-- Category Name -->
+      <div class="mb-4">
+        <label for="category_name" class="form-label fw-semibold">Material Type Name</label>
+        <input type="text" class="form-control" id="category_name" name="category_name" required>
+      </div>
+
+      <hr>
+
+      <!-- Metadata Section -->
+      <h5 class="text-danger fw-bold mb-3">Define Metadata Fields</h5>
+      <div id="attributes-section">
+        <div class="attribute mb-3 d-flex gap-2">
+          <input type="text" name="attr_name[]" class="form-control" placeholder="Attribute Name" required>
+          <select name="attr_type[]" class="form-select w-auto">
+            <option value="text">Text</option>
+            <option value="date">Date</option>
+            <option value="number">Number</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-outline-danger mb-4" onclick="addAttribute()">+ Add More Fields</button>
+
+      <div class="text-end">
+        <button type="submit" class="btn btn-danger fw-semibold px-4 rounded-pill">Add</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function addAttribute() {
+    const section = document.getElementById("attributes-section");
+    const div = document.createElement("div");
+    div.classList = "attribute mb-3 d-flex gap-2";
+    div.innerHTML = `
+      <input type="text" name="attr_name[]" class="form-control" placeholder="Attribute Name" required>
+      <select name="attr_type[]" class="form-select w-auto">
+        <option value="text">Text</option>
+        <option value="date">Date</option>
+        <option value="number">Number</option>
+      </select>`;
+    section.appendChild(div);
+  }
+</script>
+{% endblock %}

@@ -147,19 +147,16 @@ def login():
             return redirect("/thx")
 
     return render_template("login.html")
+
 @app.route("/repo", methods=["POST", "GET"])
 def repo():
     cursor = conn.cursor()
-
-    # Fetch categories
     cursor.execute('SELECT * FROM "UMRepo"."Category"')
     categories = cursor.fetchall()
 
     favs = []
     user_id = session.get("user_id")
-    files = []
 
-    # Fetch user's favourite file_ids
     if user_id:
         cursor.execute('SELECT "file_id" FROM "UMRepo"."favourites" WHERE user_id = %s', (user_id,))
         favs = [row[0] for row in cursor.fetchall()]
@@ -186,7 +183,7 @@ def repo():
             values.append(user_id)
 
         if search:
-            conditions.append("levenshtein(file.name, %s) < 3")
+            conditions.append("file.name ILIKE %s")
             values.append(search)
 
         if mat_type:
@@ -224,10 +221,10 @@ def repo():
     where_clause = " WHERE " + " AND ".join(conditions) if conditions else ""
     final_query = base_query + where_clause + ";"
 
-    cursor.execute(final_query, tuple(values))
-    files = cursor.fetchall()
+    # cursor.execute(final_query, tuple(values))
+    # files = cursor.fetchall()
 
-    return render_template("repository.html", files=files, categories=categories, favs=favs)
+    return render_template("repository.html", files=None, categories=categories, favs=favs)
 
 
 
@@ -257,106 +254,85 @@ def assign_access(file_id):
 
     return render_template("assign_access.html", file_id=file_id, students=students)
 
-@app.route("/upload",methods=["POST","GET"])
+@app.route("/upload", methods=["GET", "POST"])
 def upload():
-    if session['RoleID'] and (session['RoleID']==2 or session['RoleID']==3):
-        if request.method == "GET":
-            return render_template("Upload.html")
-        if request.method == "POST":
-            
-            name = request.form.get('name', '').strip()
-            description = request.form.get('description', '').strip()
-            cat_id = int(request.form.get('material_type', '0').strip())
-            
-            accessibility = request.form.get('accessibility', '').strip()
-            print(accessibility)
-            file = request.files['file']
-            subject_category = request.form.get('subject_category','').strip()
-            if 'file' not in request.files or request.files['file'].filename == '':
-                return "No File Uploaded",400
-            # try:
-            #     uploader_id = session['user_id']
-            # except ValueError:
-            #     return "Invalid uploader ID", 400
-
-                # Parse upload date
-            try:
-                    upload_date =request.form['upload_date']
-            except ValueError:
-                return "Invalid date format (YYYY-MM-DD required)", 400
-            path = os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(name))
-            
-            new_record = (f"""Insert into "UMRepo"."file"(name,description,path,uploader,upload_date,visibility,cat_id,subject_category)
-                
-            values (%s,%s,%s,%s,%s,%s,%s,%s);""")
-            uploader_id=session['user_id']
-            
-            cursor=conn.cursor()
-            
-            insert_value=(name,description,path,uploader_id,upload_date,accessibility,cat_id,subject_category)
-            cursor.execute(new_record,insert_value)
-            conn.commit()
-
-            
-            
-            file.save(path)
-            find_records=(f"""Select * from "UMRepo"."Attributes" where cat_id=%s """)
-            new_record = (f"""Insert into "UMRepo"."file_attributes"(file_id,attr_id,value)
-                          values(%s,%s,%s);""")
-            attrs=[]
-            cursor.execute(find_records,(cat_id,))
-            recs = cursor.fetchall()
-            cursor.execute("""select max(file_id) from "UMRepo"."file"  """)
-            new_cat_id = int(request.form['material_type'])
-            maximum = cursor.fetchone()[0]
-            start = 1
-            attrs = []
-
-            if new_cat_id == 1:
-                start = 1
-                attrs = [request.form.get(k) for k in ["Course Name", "Lecturer Name", "Semester", "Year", "Topic"]]
-            elif new_cat_id == 2:
-                start = 6
-                attrs = [request.form.get(k) for k in ["Course Name", "Assignment Number", "Due Date", "Instructor Name", "Year"]]
-            elif new_cat_id == 3:
-                start = 23
-                attrs = [request.form.get(k) for k in ["Course Name", "Exam Type", "Year", "Due Date", "Instructor", "Duration"]]
-            elif new_cat_id == 4:
-                start = 39
-                attrs = [request.form.get(k) for k in ["Title", "Authors", "Publication Year", "Journal/Conference Name"]]
-            elif new_cat_id == 5:
-                start = 11
-                attrs = [request.form.get(k) for k in ["Experiment Title", "Subject", "Instructor", "Lab Partners"]]
-            elif new_cat_id == 6:
-                start = 16
-                attrs = [request.form.get(k) for k in ["Title", "Student Name", "Supervisor", "Department", "Year", "Abstract", "Degree Level"]]
-            elif new_cat_id == 7:
-                start = 33
-                attrs = [request.form.get(k) for k in ["Course Name", "Instructor", "Duration", "Topic", "Title"]]
-            elif new_cat_id == 8:
-                start = 28
-                attrs = [request.form.get(k) for k in ["Title", "Speaker Name", "Course Name", "Date Presented", "Topic"]]
-            cursor.execute('SELECT MAX(file_id) FROM "UMRepo"."file"')
-            file_id = cursor.fetchone()[0]
-            new_record = '''INSERT INTO "UMRepo"."file_attributes"(file_id, attr_id, value) VALUES (%s, %s, %s);'''
-            for i, value in enumerate(attrs):
-                cursor.execute(new_record, (file_id, start + i, value))
-
-            conn.commit()
-            
-
-
-                
-
-            print(recs)
-            if accessibility == "Restricted":
-                cursor.execute('SELECT MAX(file_id) FROM "UMRepo"."file" WHERE uploader = %s', (uploader_id,))
-                file_id = cursor.fetchone()[0]
-                return redirect(url_for('assign_access', file_id=file_id))
-
-            return redirect("/thx4upl")
-    else:
+    if session.get('RoleID') not in [2, 3]:
         return abort(403)
+
+    cursor = conn.cursor()
+
+    if request.method == "GET":
+        # Get material types
+        cursor.execute('SELECT cat_id, cat_name FROM "UMRepo"."Category" ORDER BY cat_id')
+        material_types = cursor.fetchall()
+
+        # Get attribute fields
+        cursor.execute('SELECT cat_id, name, input_type FROM "UMRepo"."Attributes" ORDER BY attr_id')
+        raw_attrs = cursor.fetchall()
+
+        # Build attribute_map
+        attribute_map = {}
+        for cat_id, name, input_type in raw_attrs:
+            attribute_map.setdefault(cat_id, []).append({
+                "label": name,
+                "name": name,
+                "type": input_type or "text"
+            })
+
+        return render_template("Upload.html", material_types=material_types, attribute_map=attribute_map)
+
+    # POST method: handle upload
+    name = request.form.get('name', '').strip()
+    description = request.form.get('description', '').strip()
+    cat_id = int(request.form.get('material_type'))
+    accessibility = request.form.get('accessibility', '').strip()
+    subject_category = request.form.get('subject_category', '').strip()
+    upload_date = request.form.get('upload_date')
+
+    if 'file' not in request.files or request.files['file'].filename == '':
+        return "No File Uploaded", 400
+
+    file = request.files['file']
+    uploader_id = session['user_id']
+
+    filename = secure_filename(file.filename)
+    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(path)
+
+    # Insert file record
+    insert_file_query = '''
+        INSERT INTO "UMRepo"."file" 
+        (name, description, path, uploader, upload_date, visibility, cat_id, subject_category)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    '''
+    cursor.execute(insert_file_query, (name, description, path, uploader_id, upload_date, accessibility, cat_id, subject_category))
+    conn.commit()
+
+    # Get file ID
+    cursor.execute('SELECT MAX(file_id) FROM "UMRepo"."file"')
+    file_id = cursor.fetchone()[0]
+
+    # Get attributes for the category
+    cursor.execute('SELECT attr_id, name FROM "UMRepo"."Attributes" WHERE cat_id = %s ORDER BY attr_id', (cat_id,))
+    attrs = cursor.fetchall()
+
+    # Insert dynamic attributes
+    insert_attr_query = '''
+        INSERT INTO "UMRepo"."file_attributes"(file_id, attr_id, value)
+        VALUES (%s, %s, %s)
+    '''
+    for attr_id, name in attrs:
+        value = request.form.get(name, '').strip()
+        cursor.execute(insert_attr_query, (file_id, attr_id, value))
+
+    conn.commit()
+
+    if accessibility == "Restricted":
+        return redirect(url_for('assign_access', file_id=file_id))
+
+    return redirect("/thx4upl")
+
+
 @app.errorhandler(403)
 def forbidden_error(error):
 
@@ -430,15 +406,40 @@ def download(filepath):
 @app.route('/filter/<int:type>')
 def filter(type):
     cursor = conn.cursor()
-    filter_records = (f'Select * from "UMRepo"."file" WHERE cat_id = %s ')
-    cursor.execute('select * from "UMRepo"."Category"')
+
+    # Get categories for the page
+    cursor.execute('SELECT * FROM "UMRepo"."Category"')
     categories = cursor.fetchall()
-    check = """SELECT "file_id" FROM "UMRepo"."favourites" WHERE user_id = %s"""
-    cursor.execute(check, (session["user_id"],))
-    favs = [row[0] for row in cursor.fetchall()]
-    cursor.execute(filter_records,(type,))
+
+    # If not logged in, show only public files of that category
+    user_id = session.get("user_id")
+    role = session.get("RoleID")
+    favs = []
+
+    if user_id:
+        cursor.execute('SELECT "file_id" FROM "UMRepo"."favourites" WHERE user_id = %s', (user_id,))
+        favs = [row[0] for row in cursor.fetchall()]
+        visibility_condition = ''
+    else:
+        visibility_condition = 'AND file.visibility = %s'
+
+    query = f'''
+        SELECT file.*, u."Name",c."cat_name"
+        FROM "UMRepo"."file" AS file
+        JOIN "UMRepo"."User" AS u ON u.user_id = file.uploader
+        JOIN "UMRepo"."Category" AS c ON c.cat_id = file.cat_id
+        WHERE file.cat_id = %s {visibility_condition}
+    '''
+
+    params = [type]
+    if not user_id:
+        params.append("Open Access")
+
+    cursor.execute(query, tuple(params))
     files = cursor.fetchall()
-    return render_template("repository.html",files=files,categories=categories,favs=favs)
+
+    return render_template("repository.html", files=files, categories=categories, favs=favs)
+
 @app.route('/filter_favs')
 def filter_favs():
     user_id = session.get("user_id")
@@ -448,13 +449,15 @@ def filter_favs():
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM "UMRepo"."Category"')
     categories = cursor.fetchall()
+    
 
     # Only get favorites for the current user
     query = '''
-        SELECT file.*, u."Name"
+        SELECT file.*, u."Name",c."cat_name"
         FROM "UMRepo"."file" file
         JOIN "UMRepo"."favourites" fav ON fav.file_id = file.file_id
         JOIN "UMRepo"."User" u ON u.user_id = file.uploader
+        JOIN "UMRepo"."Category" c ON c.cat_id = file.cat_id
         WHERE fav.user_id = %s
     '''
     cursor.execute(query, (user_id,))
@@ -473,64 +476,47 @@ def toggle_favourite(file_id):
     if not session.get('user_id'):
         return abort(403)
     user_id = session.get('user_id')
-
     cursor = conn.cursor()
     check_query = '''SELECT 1 FROM "UMRepo"."favourites" WHERE user_id = %s AND file_id = %s'''
     cursor.execute(check_query, (user_id, file_id))
     is_fav = cursor.fetchone()
-
     if is_fav:
         delete_query = '''DELETE FROM "UMRepo"."favourites" WHERE user_id = %s AND file_id = %s'''
         cursor.execute(delete_query, (user_id, file_id))
     else:
         insert_query = '''INSERT INTO "UMRepo"."favourites"(user_id, file_id) VALUES (%s, %s)'''
         cursor.execute(insert_query, (user_id, file_id))
-
     conn.commit()
     return redirect(url_for('repo'))
-
 @app.route("/access_request")
 def access_request():
     if session.get('RoleID') != 3:
         return abort(403)
-
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM "UMRepo"."pending";')
     pending = cursor.fetchall()
-
     cursor.execute('SELECT * FROM "UMRepo"."User" WHERE user_id != %s;', (session["user_id"],))
     users = cursor.fetchall()
-
     return render_template("AccessRequests.html", pending=pending, users=users)
-
-
 @app.route('/promote_demote', methods=['POST'])
 def promote_demote():
     if session.get('RoleID') != 3:
         return abort(403)
-
     user_id = int(request.form.get("target_user_id"))
     action = request.form.get("action")
 
     if user_id == session.get("user_id"):
         return abort(403)
-
     cursor = conn.cursor()
     cursor.execute('SELECT "RoleID" FROM "UMRepo"."User" WHERE user_id = %s', (user_id,))
     current_role = cursor.fetchone()[0]
-
     new_role = None
-    if action == "promote":
-        if current_role == 1:
-            new_role = 2
-        elif current_role == 2:
-            new_role = 3
-    elif action == "demote":
-        if current_role == 3:
-            new_role = 2
-        elif current_role == 2:
-            new_role = 1
-
+    if current_role >= 1 and current_role >=3:
+        if action == "promote":
+            new_role+=1
+        elif action == "demote":
+            new_role-=1
+    current_role = new_role
     if new_role:
         cursor.execute('UPDATE "UMRepo"."User" SET "RoleID" = %s WHERE user_id = %s', (new_role, user_id))
         conn.commit()
@@ -619,15 +605,15 @@ def edit_upload(file_id):
     cursor = conn.cursor()
     uploader_id = session['user_id']
 
-    # Fetch all categories
+    # Get all categories
     cursor.execute('SELECT cat_id, cat_name FROM "UMRepo"."Category"')
     categories = cursor.fetchall()
 
-    # Fetch distinct subject categories
+    # Get distinct subject categories
     cursor.execute('SELECT DISTINCT subject_category FROM "UMRepo"."file"')
     subject_categories = [row[0] for row in cursor.fetchall()]
 
-    # Get current file details
+    # Fetch file details
     cursor.execute('''
         SELECT name, description, visibility, cat_id, subject_category 
         FROM "UMRepo"."file" 
@@ -640,82 +626,59 @@ def edit_upload(file_id):
 
     name, description, visibility, cat_id, subject_category = file
 
-    # Fetch and prepare all attribute fields
+    # ✅ Dynamically load all attributes with their values per category
     attribute_map = {}
     for cid, _ in categories:
         cursor.execute('''
-            SELECT a.attr_id, a.name, fa.value 
+            SELECT a.attr_id, a.name, a.input_type, COALESCE(fa.value, '') 
             FROM "UMRepo"."Attributes" a
             LEFT JOIN "UMRepo"."file_attributes" fa 
                 ON a.attr_id = fa.attr_id AND fa.file_id = %s
             WHERE a.cat_id = %s
+            ORDER BY a.attr_id
         ''', (file_id, cid))
         attrs = cursor.fetchall()
         attribute_map[str(cid)] = [
-            {"id": attr[0], "name": attr[1], "value": attr[2] or ""}
-            for attr in attrs
+            {"name": attr[1], "type": attr[2] or "text", "value": attr[3]} for attr in attrs
         ]
 
     if request.method == 'POST':
-        name = request.form['name']
-        description = request.form['description']
-        visibility = request.form['visibility']
+        new_name = request.form['name']
+        new_description = request.form['description']
+        new_visibility = request.form['visibility']
         new_cat_id = int(request.form['material_type'])
         new_subject_category = request.form['subject_category']
 
-        # Update file metadata
+        # Update file table
         cursor.execute('''
             UPDATE "UMRepo"."file"
             SET name = %s, description = %s, visibility = %s, cat_id = %s, subject_category = %s
             WHERE file_id = %s AND uploader = %s
-        ''', (name, description, visibility, new_cat_id, new_subject_category, file_id, uploader_id))
+        ''', (new_name, new_description, new_visibility, new_cat_id, new_subject_category, file_id, uploader_id))
 
-        # Clear old attributes
+        # Delete old attributes
         cursor.execute('DELETE FROM "UMRepo"."file_attributes" WHERE file_id = %s', (file_id,))
 
-        # Parse and insert new attributes based on category
-        start = 1
-        attrs = []
+        # Insert updated attributes
+        cursor.execute('SELECT attr_id, name FROM "UMRepo"."Attributes" WHERE cat_id = %s', (new_cat_id,))
+        new_attrs = cursor.fetchall()
 
-        if new_cat_id == 1:
-            start = 1
-            attrs = [request.form.get(k) for k in ["Course Name", "Lecturer Name", "Semester", "Year", "Topic"]]
-        elif new_cat_id == 2:
-            start = 6
-            attrs = [request.form.get(k) for k in ["Course Name", "Assignment Number", "Due Date", "Instructor Name", "Year"]]
-        elif new_cat_id == 3:
-            start = 23
-            attrs = [request.form.get(k) for k in ["Course Name", "Exam Type", "Year", "Due Date", "Instructor", "Duration"]]
-        elif new_cat_id == 4:
-            start = 39
-            attrs = [request.form.get(k) for k in ["Title", "Authors", "Publication Year", "Journal/Conference Name"]]
-        elif new_cat_id == 5:
-            start = 11
-            attrs = [request.form.get(k) for k in ["Experiment Title", "Subject", "Instructor", "Lab Partners"]]
-        elif new_cat_id == 6:
-            start = 16
-            attrs = [request.form.get(k) for k in ["Title", "Student Name", "Supervisor", "Department", "Year", "Abstract", "Degree Level"]]
-        elif new_cat_id == 7:
-            start = 33
-            attrs = [request.form.get(k) for k in ["Course Name", "Instructor", "Duration", "Topic", "Title"]]
-        elif new_cat_id == 8:
-            start = 28
-            attrs = [request.form.get(k) for k in ["Title", "Speaker Name", "Course Name", "Date Presented", "Topic"]]
-
-        new_record = '''INSERT INTO "UMRepo"."file_attributes"(file_id, attr_id, value) VALUES (%s, %s, %s);'''
-        for i, value in enumerate(attrs):
-            cursor.execute(new_record, (file_id, start + i, value))
+        insert_query = '''
+            INSERT INTO "UMRepo"."file_attributes"(file_id, attr_id, value) VALUES (%s, %s, %s)
+        '''
+        for attr_id, name in new_attrs:
+            val = request.form.get(name, '')
+            cursor.execute(insert_query, (file_id, attr_id, val))
 
         conn.commit()
 
-        # ✅ Redirect to assign access if visibility is set to Restricted
-        if visibility == "Restricted":
+        if new_visibility == "Restricted":
             return redirect(url_for("assign_access", file_id=file_id))
 
-        return redirect(url_for('my_uploads'))
+        return redirect(url_for("my_uploads"))
 
     return render_template(
-        'edit.html',
+        "edit.html",
         file=[name, description, visibility],
         file_id=file_id,
         material_types=categories,
@@ -724,6 +687,8 @@ def edit_upload(file_id):
         file_subject=subject_category,
         attribute_map=attribute_map
     )
+
+
 
 
 
@@ -788,6 +753,24 @@ def view(file_id):
     print(file_info)
     print(attributes)
     return render_template("view.html", file_info=file_info, attributes=attributes)
+
+
+@app.route('/add_category', methods=['GET', 'POST'])
+def add_category():
+    if session.get('RoleID') != 3:
+        return abort(403)
+
+    if request.method == 'POST':
+        new_category = request.form.get('category_name').strip()
+
+        if new_category:
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO "UMRepo"."Category" (cat_name) VALUES (%s)', (new_category,))
+            conn.commit()
+            return redirect('/repo')
+
+    return render_template('add_category.html')
+
 
 if __name__ == '__main__':
 

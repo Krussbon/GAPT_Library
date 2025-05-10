@@ -203,3 +203,23 @@ footer {
     background-color: #fff3f3;
   }
   
+
+  
+.favourite-btn {
+  background: linear-gradient(135deg, #ff4d4d, #c82333);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.25s ease-in-out;
+}
+
+.favourite-btn:hover {
+  background: linear-gradient(135deg, #e63946, #a4161a);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}

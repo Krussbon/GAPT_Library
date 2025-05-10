@@ -39,35 +39,62 @@
     footer a:hover {
       color: #c00000;
       text-decoration: underline;
+
     }
+
+    .nav-link {
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #a00000;
+  transform: translateY(-1px);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+
+.navbar-brand:hover {
+  text-shadow: 0 2px 4px rgb(246, 243, 243);
+  transform: scale(1.02);
+}
+
   </style>
 </head>
 
 <body class="d-flex flex-column min-vh-100">
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm px-4 py-2">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center text-danger fw-bold fs-4" href="{{ url_for('index') }}">
-        <img src="{{ url_for('static', filename='images/book-7672463_1280.png') }}" width="32" class="me-2"> AcaRep
-      </a>
-      
-      <div class="ms-auto d-flex align-items-center gap-3">
-        {% if session.get('user_id') %}
-          <a class="text-danger fw-semibold" href="{{ url_for('repo') }}">Repository</a>
-          {% if session.get('RoleID') == 3 %}
-            <a class="text-danger fw-semibold" href="{{ url_for('access_request') }}">Access Requests</a>
-          {% endif %}
-          <a class="text-danger fw-semibold" href="{{ url_for('logout') }}">Logout</a>
-        {% else %}
-          <a class="text-danger fw-semibold" href="{{ url_for('repo') }}">Repository</a>
-          <a class="text-danger fw-semibold" href="{{ url_for('login') }}">Login</a>
-        {% endif %}
+  <nav class="navbar navbar-expand-lg shadow-sm px-4 py-3 sticky-top" style="background-color: #ffffff; border-bottom: 2px solid #c00000; z-index: 1000;">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+
+    <!-- Logo and Brand -->
+    <a class="navbar-brand d-flex align-items-center fw-bold fs-3 text-danger" href="{{ url_for('index') }}">
+      <div class="bg-danger rounded-circle p-1 me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+        <img src="{{ url_for('static', filename='images/book-7672463_1280.png') }}" alt="Logo" class="img-fluid" style="width: 24px;">
       </div>
-      
-      
+      AcaRep
+    </a>
+
+    <!-- Navigation Links -->
+    <div class="d-flex align-items-center gap-4">
+      {% if session.get('user_id') %}
+        <a class="nav-link text-danger fw-semibold link-hover" href="{{ url_for('repo') }}">Repository</a>
+        {% if session.get('RoleID') == 3 %}
+          <a class="nav-link text-danger fw-semibold link-hover" href="{{ url_for('access_request') }}">Access Requests</a>
+          <a class="nav-link text-danger fw-semibold link-hover" href="{{ url_for('add_category') }}"> Manage categories  </a>
+        {% endif %}
+        <a class="nav-link text-danger fw-semibold link-hover" href="{{ url_for('logout') }}">Logout</a>
+      {% else %}
+        <a class="nav-link text-danger fw-semibold link-hover" href="{{ url_for('repo') }}">Repository</a>
+        <a class="nav-link text-danger fw-semibold link-hover" href="{{ url_for('login') }}">Login</a>
+
+  
+
+      {% endif %}
     </div>
-  </nav>
+
+  </div>
+</nav>
+
 
   <!-- Main Content -->
   <main class="flex-grow-1">

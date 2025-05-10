@@ -1,79 +1,109 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container my-4">
-
-    <!-- Page Header + Upload & My Uploads Button -->
-    <div class="d-flex justify-content-between align-items-start mb-3">
-        <h1 class="text-danger fw-bold">Repository</h1>
-        {% if 'RoleID' in session and session['RoleID'] >= 2 %}
-        <div class="d-flex flex-column align-items-end">
-          <a href="{{ url_for('upload') }}" class="btn btn-danger fw-semibold mb-2">+ Upload</a>
-          <a href="{{ url_for('my_uploads') }}" class="btn btn-outline-danger">📁 My Uploads</a>
-        </div>
-        {% endif %}
-      </div>
-    
-
-  <!-- Filter Buttons -->
-  <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
-    {% for i in range(1, 9) %}
-      <a href="{{ url_for('filter', type=i) }}" class="btn btn-outline-danger">{{ categories[i-1][0] }}</a>
-    {% endfor %}
-    <a href="{{ url_for('filter_favs') }}" class="btn btn-outline-danger">Favourites Only</a>
+<!-- Header Row -->
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div class="d-flex flex-column align-items-start">
+    <h1 class="text-danger fw-bold mb-2">Repository</h1>
+    <a href="{{ url_for('filter_favs') }}" class="btn btn-danger">My Favourites ❤️</a>
   </div>
 
-  <!-- Search Form -->
-  <form method="post" class="d-flex justify-content-center mb-4" enctype="multipart/form-data">
-    <input type="search" name="search_images" class="form-control w-50 me-2" placeholder="Search by name">
-    <button type="submit" class="btn btn-outline-danger">Search</button>
-  </form>
+  {% if 'RoleID' in session and session['RoleID'] >= 2 %}
+  <div class="d-flex flex-column align-items-end">
+    <a href="{{ url_for('upload') }}" class="btn btn-danger fw-semibold mb-2">+ Upload</a>
+    <a href="{{ url_for('my_uploads') }}" class="btn btn-outline-danger mb-2">📁 My Uploads</a>
+  </div>
+  {% endif %}
+</div>
 
-  <div class="table-wrapper">
-    <table class="table repo-table text-center">
-      <thead>
-        <tr>
-          <th>File Name</th>
-          <th>Date Created</th>
-          <th>Subject Category</th>
-          <th>Uploaders</th>
-          <th>Availability</th>
-          <th>Material Type</th>
-          <th>Favourite</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
+<!-- Browse Title -->
+<h2 class="text-danger text-center mb-4 fw-bold">Browse by Material Type</h2>
+
+<!-- Material Type Buttons -->
+<div class="row g-4 justify-content-center" id="top-buttons">
+  {% for cat in categories %}
+  <div class="col-md-3" data-aos="zoom-in">
+    <a class="btn btn-danger w-100 py-4 fs-5 fw-semibold rounded-4 shadow" href="{{ url_for('filter', type=cat[1]) }}">
+      {{ cat[0] }}
+    </a>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Material Table (only shown if files is defined) -->
+{% if files is defined %}
+<div class="table-responsive mt-5" data-aos="fade-up">
+  
+  {% if files %}
+  <table class="table text-center table-hover shadow-lg rounded overflow-hidden">
+    <thead style="background-color: #d9534f; color: white;">
+      <tr>
+        <th>File Name</th>
+        <th>Date</th>
+        <th>Subject Category</th>
+        <th>Material Type</th>
+        <th>Uploader</th>
+        <th>Availability</th>
+        <th>Favourite</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
         {% for x in files %}
-        <tr>
+        <tr style="background-color: #fff6f6;">
           <td>{{ x[0] }}</td>
           <td>{{ x[4] }}</td>
           <td>{{ x[8] }}</td>
-          
-          <td>{{ x[-1]}}</td>
+          <td>{{ x[-1] }}</td>
+          <td>{{ x[-2] }}</td>
           <td>{{ x[5] }}</td>
-          <td>{{ categories[x[6]-1][0] }}</td>
           <td>
-            <a href="{{ url_for('toggle_favourite', file_id=x[7]) }}" class="favourite-icon">
-              {% if x[7] not in favs %}
-                🤍
-              {% else %}
-                ❤️
-              {% endif %}
+            <a href="{{ url_for('toggle_favourite', file_id=x[7]) }}" class="favourite-icon fs-5">
+              {% if x[7] not in favs %} 🤍 {% else %} ❤️ {% endif %}
             </a>
           </td>
           <td>
-            <a href="{{ url_for('download', filepath=x[2]) }}" class="btn btn-danger btn-sm rounded-pill px-3 py-1">
-              <i class="bi bi-download"></i> Download
+            <a href="{{ url_for('download', filepath=x[2]) }}" class="btn btn-sm btn-danger rounded-pill px-3 py-1">
+              Download
             </a>
           </td>
         </tr>
         {% endfor %}
+      
       </tbody>
     </table>
-  </div>
+    {% endif %}
   
- 
+  
+  <div class="text-center my-4">
+    <a href="{{ url_for('repo') }}" class="btn btn-outline-danger rounded-pill px-4 py-2">
+      ⬆ Back to Material Types
+    </a>
+  </div>
 </div>
+{% endif %}
+
+<!-- Scripts & Styles -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>
+
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+  .table thead th {
+    vertical-align: middle;
+  }
+  .table td, .table th {
+    vertical-align: middle;
+  }
+  .material-btn:hover {
+    transform: scale(1.03);
+    transition: 0.3s ease;
+  }
+</style>
 
 {% endblock %}

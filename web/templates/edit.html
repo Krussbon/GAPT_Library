@@ -82,88 +82,38 @@
 
 <!-- JavaScript -->
 <script>
-function updateFormFields() {
-  let materialType = document.getElementById('material_type').value;
-  const dynamicFields = document.getElementById('attribute_fields');
-  dynamicFields.innerHTML = '';
+  const attributeData = {{ attribute_map | tojson }};
 
-  const fieldTemplate = (label, name, type = 'text') => `
-    <div class="mb-3">
-      <label for="${name}" class="form-label text-danger">${label}</label>
-      <input id="${name}" name="${name}" type="${type}" class="form-control" required>
-    </div>
-  `;
+  function updateFormFields() {
+    const selectedId = document.getElementById("material_type").value;
+    const container = document.getElementById("attribute_fields");
+    container.innerHTML = "";
 
-  switch (materialType) {
-    case '1':
-      dynamicFields.innerHTML =
-        fieldTemplate("Course Name", "Course Name") +
-        fieldTemplate("Lecturer Name", "Lecturer Name") +
-        fieldTemplate("Semester", "Semester", "number") +
-        fieldTemplate("Year", "Year", "number") +
-        fieldTemplate("Topic", "Topic");
-      break;
-    case '2':
-      dynamicFields.innerHTML =
-        fieldTemplate("Course Name", "Course Name") +
-        fieldTemplate("Assignment Number", "Assignment Number", "number") +
-        fieldTemplate("Due Date", "Due Date", "date") +
-        fieldTemplate("Instructor Name", "Instructor Name") +
-        fieldTemplate("Year", "Year", "number");
-      break;
-    case '3':
-      dynamicFields.innerHTML =
-        fieldTemplate("Course Name", "Course Name") +
-        fieldTemplate("Exam Type", "Exam Type") +
-        fieldTemplate("Year", "Year") +
-        fieldTemplate("Instructor", "Instructor") +
-        fieldTemplate("Duration (hrs)", "Duration", "number");
-      break;
-    case '4':
-      dynamicFields.innerHTML =
-        fieldTemplate("Title", "Title") +
-        fieldTemplate("Authors", "Authors") +
-        fieldTemplate("Publication Year", "Publication Year", "number") +
-        fieldTemplate("Journal/Conference Name", "Journal/Conference Name");
-      break;
-    case '5':
-      dynamicFields.innerHTML =
-        fieldTemplate("Experiment Title", "Experiment Title") +
-        fieldTemplate("Subject", "Subject") +
-        fieldTemplate("Instructor", "Instructor") +
-        fieldTemplate("Lab Partners", "Lab Partners");
-      break;
-    case '6':
-      dynamicFields.innerHTML =
-        fieldTemplate("Title", "Title") +
-        fieldTemplate("Student Name", "Student Name") +
-        fieldTemplate("Supervisor", "Supervisor") +
-        fieldTemplate("Department", "Department") +
-        fieldTemplate("Year", "Year", "number") +
-        fieldTemplate("Abstract", "Abstract") +
-        fieldTemplate("Degree Level", "Degree Level");
-      break;
-    case '7':
-      dynamicFields.innerHTML =
-        fieldTemplate("Course Name", "Course Name") +
-        fieldTemplate("Title", "Title") +
-        fieldTemplate("Instructor", "Instructor") +
-        fieldTemplate("Duration", "Duration", "number") +
-        fieldTemplate("Topic", "Topic");
-      break;
-    case '8':
-      dynamicFields.innerHTML =
-        fieldTemplate("Title", "Title") +
-        fieldTemplate("Speaker Name", "Speaker Name") +
-        fieldTemplate("Event/Course Name", "Course Name") +
-        fieldTemplate("Date Presented", "Date Presented", "date") +
-        fieldTemplate("Topic", "Topic");
-      break;
+    if (attributeData[selectedId]) {
+      attributeData[selectedId].forEach(attr => {
+        const input = document.createElement("input");
+        input.type = attr.type || "text";
+        input.className = "form-control";
+        input.name = attr.name;
+        input.id = attr.name;
+        input.value = attr.value || "";
+
+        const label = document.createElement("label");
+        label.className = "form-label text-danger mt-3";
+        label.htmlFor = attr.name;
+        label.innerText = attr.name;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "mb-3";
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+
+        container.appendChild(wrapper);
+      });
+    }
   }
-}
-window.onload = updateFormFields;
 
-
+  window.onload = updateFormFields;
 </script>
 
 {% endblock %}
