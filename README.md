@@ -16,13 +16,34 @@ The Academic Repository platform allows:
 
 # 🛠 Tech Stack
 
-Frontend: HTML, CSS, JavaScript (React.js)
+ Frontend: HTML + CSS + JavaScript (with Bootstrap for styling and AOS for animations)
 
-Backend: Python
 
-Database: PostgreSQL (managed with pgAdmin)
+ Backend: Python (with Flask). Flask handles routing, session management, user authentication, and database logic.
 
-IDE: Visual Studio Code
+
+ Database: PostgreSQL (managed via psycopg2 for raw SQL queries and SQLAlchemy ORM for model-based interactions)
+
+
+ Tools & Environment:
+
+
+• Visual Studio Code (with extensions for Python, HTML, and PostgreSQL)
+
+
+• GitHub for version control
+
+
+• dotenv for managing environment variables securely
+
+
+• bcrypt for password hashing and secure authentication
+
+
+• Werkzeug for secure URL routing and request handling
+
+
+• Jinja2 for dynamic HTML templating
 
 # 🎯 Key Features
 
@@ -38,41 +59,19 @@ IDE: Visual Studio Code
 
 # 📋 How to Run the Project Locally
 
-- Backend Setup:
+Step 1: Download the Acarep.sql file
 
-Install Python dependencies:
+Step 2: Open Command Prompt Or Powershell and go to path C:\Program Files\PostgreSQL\<VERSION>\bin
+where VERSION is the number
 
-bash
-Copy
-Edit
-pip install -r requirements.txt
-Configure your database connection in the backend.
+Step 3: Copy .\createdb -U postgres AcaRep into your terminal and hit Enter
 
-- Run the Backend:
+Step 4: Copy .\psql -U postgres -p 5234 -d AcaRep -f "C:\Users\<USER>\Downloads\AcaRep.sql" into your terminal and hit Enter
 
-bash
-Copy
-Edit
-python app.py
-Frontend Setup:
+Step 5:Clone the project to your local directory
 
-Navigate to the frontend folder.
+Step 6: In the cloned folder, run the file "backendlogic.py", It should give you two ip addresses in the terminal upon running 
 
-- Install React dependencies:
+Step 7: Hit ctrl+left click on one of the ip addresses and add /index at the end, doing so will take you to the website
 
-bash
-Copy
-Edit
-npm install
-
-- Start the frontend server:
-
-bash
-Copy
-Edit
-npm start
-Access the App:
-
-- Open your browser and visit: 
-
-# 🎉 Thank you for checking out the Academic Repository Project!
+#  Thank you for checking out the Academic Repository Project!
