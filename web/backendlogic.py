@@ -151,6 +151,8 @@ def login():
 @app.route("/repo", methods=["POST", "GET"])
 def repo():
     cursor = conn.cursor()
+
+    # Get all categories
     cursor.execute('SELECT * FROM "UMRepo"."Category"')
     categories = cursor.fetchall()
 
@@ -161,34 +163,22 @@ def repo():
         cursor.execute('SELECT "file_id" FROM "UMRepo"."favourites" WHERE user_id = %s', (user_id,))
         favs = [row[0] for row in cursor.fetchall()]
 
-    # Start base query
+    # Base query
     base_query = '''
         SELECT file.*, u."Name"
         FROM "UMRepo"."file" AS file
         JOIN "UMRepo"."User" AS u ON u.user_id = file.uploader
     '''
-
     conditions = []
     values = []
 
-    # Filters (POST search)
+    # Handle search form
     if request.method == "POST":
-        search = request.form.get("search_images")
-        mat_type = request.form.get("material_type")
-        is_favs = request.form.get("favourites") == 'on'
-
-        if is_favs and user_id:
-            base_query += ' JOIN "UMRepo"."favourites" fav ON fav.file_id = file.file_id'
-            conditions.append("fav.user_id = %s")
-            values.append(user_id)
-
+        search = request.form.get("search_term")
         if search:
-            conditions.append("file.name ILIKE %s")
-            values.append(search)
-
-        if mat_type:
-            conditions.append("file.cat_id = %s")
-            values.append(mat_type)
+            # Search by file name OR uploader name
+            conditions.append('(file.name ILIKE %s OR u."Name" ILIKE %s)')
+            values.extend([f"%{search}%", f"%{search}%"])
 
     # Visibility logic
     if not user_id:
@@ -197,7 +187,7 @@ def repo():
     else:
         role = session.get("RoleID")
         if role == 3:
-            pass  # Librarian sees all files
+            pass  # Librarian sees everything
         elif role == 2:  # Teacher
             conditions.append('''(
                 file.visibility = %s OR 
@@ -208,7 +198,7 @@ def repo():
                 file.uploader = %s
             )''')
             values.extend(["Open Access", "University Only", user_id, user_id])
-        else:  # Students
+        else:  # Student
             conditions.append('''(
                 file.visibility = %s OR 
                 file.file_id IN (
@@ -217,15 +207,14 @@ def repo():
             )''')
             values.extend(["Open Access", user_id])
 
-    # Final query
+    # Construct final query
     where_clause = " WHERE " + " AND ".join(conditions) if conditions else ""
     final_query = base_query + where_clause + ";"
 
-    # cursor.execute(final_query, tuple(values))
-    # files = cursor.fetchall()
+    cursor.execute(final_query, tuple(values))
+    files = cursor.fetchall()
 
-    return render_template("repository.html", files=None, categories=categories, favs=favs)
-
+    return render_template("repository.html", files=files, categories=categories, favs=favs)
 
 
 @app.route("/granted")
