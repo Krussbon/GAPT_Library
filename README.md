@@ -117,7 +117,7 @@ secrets
 datetime  
 flask_sqlalchemy  
 sqlalchemy
-werkzeug.utils```
+werkzeug.utils
 #  Thank you for checking out the Academic Repository Project!
 
 
