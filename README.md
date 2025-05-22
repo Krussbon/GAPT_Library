@@ -105,7 +105,7 @@ Step 7: Hit ctrl+left click on one of the ip addresses and add /index at the end
   using the command prompt or powershell
   type
 
-  pip install flask
+  ```pip install flask
 flask_login 
 os 
 psycopg2 
@@ -117,7 +117,7 @@ secrets
 datetime  
 flask_sqlalchemy  
 sqlalchemy
-werkzeug.utils
+werkzeug.utils```
 #  Thank you for checking out the Academic Repository Project!
 
 
