@@ -76,19 +76,19 @@ Step 7: Hit ctrl+left click on one of the ip addresses and add /index at the end
 
 
  install 
- flask
-flask_login
-os
-psycopg2
-dotenv
-bcrypt
-os
-json
-secrets
-datetime 
-flask_sqlalchemy 
-sqlalchemy
-  werkzeug.utils
+• flask
+• flask_login
+• os
+• psycopg2
+• dotenv
+• bcrypt
+• os
+• json
+• secrets
+• datetime 
+• flask_sqlalchemy 
+• sqlalchemy
+• werkzeug.utils
   using the command prompt or powershell
 #  Thank you for checking out the Academic Repository Project!
 
