@@ -88,8 +88,6 @@ Step 7: Hit ctrl+left click on one of the ip addresses and add /index at the end
 
 - bcrypt
 
-- os
-
 - json
 
 - secrets
@@ -106,7 +104,7 @@ Step 7: Hit ctrl+left click on one of the ip addresses and add /index at the end
   type
 
   ```bash
-  pip install flask flask_login os psycopg2 dotenv bcrypt os json secrets datetime  flask_sqlalchemy  sqlalchemy werkzeug.utils
+  pip install flask flask_login os psycopg2 dotenv bcrypt json secrets datetime  flask_sqlalchemy  sqlalchemy werkzeug.utils
 #  Thank you for checking out the Academic Repository Project!
 
 
