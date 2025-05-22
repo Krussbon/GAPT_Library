@@ -74,4 +74,22 @@ Step 6: In the cloned folder, run the file "backendlogic.py", It should give you
 
 Step 7: Hit ctrl+left click on one of the ip addresses and add /index at the end, doing so will take you to the website
 
+
+ install 
+ flask
+flask_login
+os
+psycopg2
+dotenv
+bcrypt
+os
+json
+secrets
+datetime 
+flask_sqlalchemy 
+sqlalchemy
+  werkzeug.utils
+  using the command prompt or powershell
 #  Thank you for checking out the Academic Repository Project!
+
+
