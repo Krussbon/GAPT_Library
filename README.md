@@ -62,7 +62,7 @@ The Academic Repository platform allows:
 📋 How to Run the AcaRep Project Locally
 This guide will walk you through running the AcaRep academic repository system on your local machine using Flask and PostgreSQL.
 
-🛠️ Step-by-Step Setup
+🛠 Step-by-Step Setup
 
 ✅ Step 1: Install Required Software
 
@@ -178,7 +178,7 @@ Edit
 http://127.0.0.1:5000/index
 You should now see the homepage of AcaRep.
 
-✅ Optional: Set Up the Database via pgAdmin
+ Optional: Set Up the Database via pgAdmin
 
 If you prefer a visual interface:
 
@@ -202,7 +202,7 @@ Click ▶ (Run) or press F5
 
 All tables, data, and schema will be imported.
 
-✅ Required Python Packages
+ Required Python Packages
 
 Installed automatically using:
 
