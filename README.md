@@ -104,7 +104,8 @@ Step 7: Hit ctrl+left click on one of the ip addresses and add /index at the end
   type
 
   ```bash
-  pip install flask flask_login os psycopg2 dotenv bcrypt  secrets datetime  flask_sqlalchemy  sqlalchemy werkzeug.utils
+  pip install -r requirements.txt
+which will install all the packages and modules needed for the project 
 #  Thank you for checking out the Academic Repository Project!
 
 
