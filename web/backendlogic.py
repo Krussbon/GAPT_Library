@@ -23,7 +23,7 @@ conn = psycopg2.connect(
     user="postgres",
     password="0000"
 )
-print("✅ Connection successful")
+print(" Connection successful")
 
 
 # Create a dictionary for the pairs
@@ -615,7 +615,7 @@ def edit_upload(file_id):
 
     name, description, visibility, cat_id, subject_category = file
 
-    # ✅ Dynamically load all attributes with their values per category
+    #  Dynamically load all attributes with their values per category
     attribute_map = {}
     for cid, _ in categories:
         cursor.execute('''
@@ -704,7 +704,7 @@ def delete_upload(file_id):
         conn.commit()
 
     except Exception as e:
-        print("❌ Deletion failed:", e)
+        print(" Deletion failed:", e)
         conn.rollback()
         return "Could not delete file due to existing dependencies.", 500
 
